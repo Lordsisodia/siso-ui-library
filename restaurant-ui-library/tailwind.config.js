@@ -39,6 +39,7 @@ module.exports = {
         "border-beam": "border-beam var(--duration,5s) infinite linear",
         "shine-pulse": "shine-pulse var(--shine-pulse-duration,14s) infinite linear",
         "spin-slow": "spin 6s linear infinite",
+        "icon-bounce": "icon-bounce 1.2s ease-out",
       },
       keyframes: {
         marquee: {
@@ -102,6 +103,13 @@ module.exports = {
             transform: "translateY(-50%)",
           },
         },
+        "icon-bounce": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "20%": { transform: "translateY(-0.3em)" },
+          "40%": { transform: "translateY(0)" },
+          "60%": { transform: "translateY(-0.1em)" },
+          "80%": { transform: "translateY(0)" },
+        },
       },
     },
   },
@@ -116,6 +124,26 @@ function addVariablesForColors({ addBase, theme }) {
   );
 
   addBase({
-    ":root": newVars,
+    ":root": {
+      ...newVars,
+      "--component-inactive-color": "var(--muted-foreground)",
+      "--component-bg": "var(--card)",
+      "--component-shadow": "var(--border)",
+      "--component-active-bg": "var(--secondary)",
+      "--component-line-inactive-color": "var(--border)",
+      "--component-active-color-default": "var(--accent-foreground)",
+      "--component-active-color": "var(--component-active-color-default)",
+      "--component-line-color": "var(--component-active-color)",
+    },
+    ".dark": {
+      "--component-inactive-color": "var(--muted-foreground)",
+      "--component-bg": "var(--card)",
+      "--component-shadow": "var(--border)",
+      "--component-active-bg": "var(--secondary)",
+      "--component-line-inactive-color": "var(--muted-foreground)",
+      "--component-active-color-default": "var(--accent-foreground)",
+      "--component-active-color": "var(--component-active-color-default)",
+      "--component-line-color": "var(--component-active-color)",
+    },
   });
 }

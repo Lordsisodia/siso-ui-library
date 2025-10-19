@@ -16,8 +16,4119 @@ When you're ready for me to import the components, let me know.
 
 <!-- Add new component batches below this line -->
 
+You are given a task to integrate an existing React component in the codebase
 
-tsx
+The codebase should support:
+- shadcn project structure  
+- Tailwind CSS
+- Typescript
+
+If it doesn't, provide instructions on how to setup project via shadcn CLI, install Tailwind or Typescript.
+
+Determine the default path for components and styles. 
+If default path for components is not /components/ui, provide instructions on why it's important to create this folder
+Copy-paste this component to /components/ui folder:
+```tsx
+wave-path.tsx
+'use client';
+import React from 'react';
+import { cn } from '@/lib/utils';
+import { useRef, useEffect } from 'react';
+
+type WWavePathProps = React.ComponentProps<'div'>;
+
+export function WavePath({ className, ...props }: WWavePathProps) {
+	const path = useRef<SVGPathElement>(null);
+	let progress = 0;
+	let x = 0.2;
+	let time = Math.PI / 2;
+	let reqId: number | null = null;
+
+	useEffect(() => {
+		setPath(progress);
+	}, []);
+
+	const setPath = (progress: number) => {
+		const width = window.innerWidth * 0.7;
+		if (path.current) {
+			path.current.setAttributeNS(
+				null,
+				'd',
+				`M0 100 Q${width * x} ${100 + progress * 0.6}, ${width} 100`,
+			);
+		}
+	};
+
+	const lerp = (x: number, y: number, a: number) => x * (1 - a) + y * a;
+
+	const manageMouseEnter = () => {
+		if (reqId) {
+			cancelAnimationFrame(reqId);
+			resetAnimation();
+		}
+	};
+
+	const manageMouseMove = (e: React.MouseEvent) => {
+		const { movementY, clientX } = e;
+		if (path.current) {
+			const pathBound = path.current.getBoundingClientRect();
+			x = (clientX - pathBound.left) / pathBound.width;
+			progress += movementY;
+			setPath(progress);
+		}
+	};
+
+	const manageMouseLeave = () => {
+		animateOut();
+	};
+
+	const animateOut = () => {
+		const newProgress = progress * Math.sin(time);
+		progress = lerp(progress, 0, 0.025);
+		time += 0.2;
+		setPath(newProgress);
+		if (Math.abs(progress) > 0.75) {
+			reqId = requestAnimationFrame(animateOut);
+		} else {
+			resetAnimation();
+		}
+	};
+
+	const resetAnimation = () => {
+		time = Math.PI / 2;
+		progress = 0;
+	};
+
+	return (
+		<div className={cn('relative h-px w-[70vw]', className)} {...props}>
+			<div
+				onMouseEnter={manageMouseEnter}
+				onMouseMove={manageMouseMove}
+				onMouseLeave={manageMouseLeave}
+				className="relative -top-5 z-10 h-10 w-full hover:-top-[150px] hover:h-[300px]"
+			/>
+			<svg className="absolute -top-[100px] h-[300px] w-full">
+				<path ref={path} className="fill-none stroke-current" strokeWidth={2} />
+			</svg>
+		</div>
+	);
+}
+
+
+demo.tsx
+'use client';
+import React from 'react';
+import { WavePath } from "@/components/ui/wave-path";
+import { cn } from '@/lib/utils';
+
+export default function Demo() {
+	return (
+		<div className="relative w-full flex min-h-screen flex-col items-center justify-center">
+			<div
+				aria-hidden="true"
+				className={cn(
+					'pointer-events-none absolute -top-10 left-1/2 size-full -translate-x-1/2 rounded-full',
+					'bg-[radial-gradient(ellipse_at_center,--theme(--color-foreground/.1),transparent_50%)]',
+					'blur-[30px]',
+				)}
+			/>
+
+			<div className="flex w-[70vw] flex-col items-end">
+				<WavePath className="mb-10" />
+				<div className="flex w-full flex-col items-end">
+					<div className="flex justify-end">
+						<p className="text-muted-foreground mt-2 text-sm">World of Art</p>
+						<p className="text-foreground/80 ml-8 w-3/4 text-2xl md:text-4xl">
+							Experience the emotions of artists through their works. Let the
+							beauty of art inspire you and fill your soul.
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+}
+```
+
+You are given a task to integrate an existing React component in the codebase
+
+The codebase should support:
+- shadcn project structure  
+- Tailwind CSS
+- Typescript
+
+If it doesn't, provide instructions on how to setup project via shadcn CLI, install Tailwind or Typescript.
+
+Determine the default path for components and styles. 
+If default path for components is not /components/ui, provide instructions on why it's important to create this folder
+Copy-paste this component to /components/ui folder:
+```tsx
+x-gradient-card.tsx
+import { VerifiedIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
+
+interface ReplyProps {
+    authorName: string;
+    authorHandle: string;
+    authorImage: string;
+    content: string;
+    isVerified?: boolean;
+    timestamp: string;
+}
+
+interface XCardProps {
+    link: string;
+    authorName: string;
+    authorHandle: string;
+    authorImage: string;
+    content: string[];
+    isVerified?: boolean;
+    timestamp: string;
+    reply?: ReplyProps;
+}
+
+function XCard({
+    link = "https://x.com/dorian_baffier/status/1880291036410572934",
+    authorName = "Dorian",
+    authorHandle = "dorian_baffier",
+    authorImage = "https://pbs.twimg.com/profile_images/1854916060807675904/KtBJsyWr_400x400.jpg",
+    content = [
+        "All components from KokonutUI can now be open in @v0 🎉",
+        "1. Click on 'Open in V0'",
+        "2. Customize with prompts",
+        "3. Deploy to your app",
+    ],
+    isVerified = true,
+    timestamp = "Jan 18, 2025",
+    reply = {
+        authorName: "shadcn",
+        authorHandle: "shadcn",
+        authorImage:
+            "https://pbs.twimg.com/profile_images/1593304942210478080/TUYae5z7_400x400.jpg",
+        content: "Awesome.",
+        isVerified: true,
+        timestamp: "Jan 18",
+    },
+}: XCardProps) {
+    return (
+        <Link
+            href={link}
+            target="_blank"
+        >
+            <div
+                className={cn(
+                    "w-full min-w-[400px] md:min-w-[500px] max-w-xl p-1.5 rounded-2xl relative isolate overflow-hidden",
+                    "bg-white/5 dark:bg-black/90",
+                    "bg-gradient-to-br from-black/5 to-black/[0.02] dark:from-white/5 dark:to-white/[0.02]",
+                    "backdrop-blur-xl backdrop-saturate-[180%]",
+                    "border border-black/10 dark:border-white/10",
+                    "shadow-[0_8px_16px_rgb(0_0_0_/_0.15)] dark:shadow-[0_8px_16px_rgb(0_0_0_/_0.25)]",
+                    "will-change-transform translate-z-0"
+                )}
+            >
+                <div
+                    className={cn(
+                        "w-full p-5 rounded-xl relative",
+                        "bg-gradient-to-br from-black/[0.05] to-transparent dark:from-white/[0.08] dark:to-transparent",
+                        "backdrop-blur-md backdrop-saturate-150",
+                        "border border-black/[0.05] dark:border-white/[0.08]",
+                        "text-black/90 dark:text-white",
+                        "shadow-sm",
+                        "will-change-transform translate-z-0",
+                        "before:absolute before:inset-0 before:bg-gradient-to-br before:from-black/[0.02] before:to-black/[0.01] dark:before:from-white/[0.03] dark:before:to-white/[0.01] before:opacity-0 before:transition-opacity before:pointer-events-none",
+                        "hover:before:opacity-100"
+                    )}
+                >
+                    <div className="flex gap-3">
+                        <div className="flex-shrink-0">
+                            <div className="h-10 w-10 rounded-full overflow-hidden">
+                                <img
+                                    src={authorImage}
+                                    alt={authorName}
+                                    className="h-full w-full object-cover"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex-1">
+                            <div className="flex justify-between items-start">
+                                <div className="flex flex-col">
+                                    <div className="flex items-center gap-1">
+                                        <span className="font-semibold text-black dark:text-white/90 hover:underline cursor-pointer">
+                                            {authorName}
+                                        </span>
+                                        {isVerified && (
+                                            <VerifiedIcon className="h-4 w-4 text-blue-400" />
+                                        )}
+                                    </div>
+                                    <span className="text-black dark:text-white/60 text-sm">
+                                        @{authorHandle}
+                                    </span>
+                                </div>
+                                <button
+                                    type="button"
+                                    className="h-8 w-8 text-black dark:text-white/80 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-lg p-1 flex items-center justify-center"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="1200"
+                                        height="1227"
+                                        fill="none"
+                                        viewBox="0 0 1200 1227"
+                                        className="w-4 h-4"
+                                    >
+                                        <title>X</title>
+                                        <path
+                                            fill="currentColor"
+                                            d="M714.163 519.284 1160.89 0h-105.86L667.137 450.887 357.328 0H0l468.492 681.821L0 1226.37h105.866l409.625-476.152 327.181 476.152H1200L714.137 519.284h.026ZM569.165 687.828l-47.468-67.894-377.686-540.24h162.604l304.797 435.991 47.468 67.894 396.2 566.721H892.476L569.165 687.854v-.026Z"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="mt-2">
+                        {content.map((item, index) => (
+                            <p
+                                key={index}
+                                className="text-black dark:text-white/90 text-base"
+                            >
+                                {item}
+                            </p>
+                        ))}
+                        <span className="text-black dark:text-white/50 text-sm mt-2 block">
+                            {timestamp}
+                        </span>
+                    </div>
+
+                    {reply && (
+                        <div className="mt-4 pt-4 border-t border-black/[0.08] dark:border-white/[0.08]">
+                            <div className="flex gap-3">
+                                <div className="flex-shrink-0">
+                                    <div className="h-10 w-10 rounded-full overflow-hidden">
+                                        <img
+                                            src={reply.authorImage}
+                                            alt={reply.authorName}
+                                            className="h-full w-full object-cover"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="flex-1">
+                                    <div className="flex items-center gap-1">
+                                        <span className="font-semibold text-black dark:text-white/90 hover:underline cursor-pointer">
+                                            {reply.authorName}
+                                        </span>
+                                        {reply.isVerified && (
+                                            <VerifiedIcon className="h-4 w-4 text-blue-400" />
+                                        )}
+                                        <span className="text-black dark:text-white/60 text-sm">
+                                            @{reply.authorHandle}
+                                        </span>
+                                        <span className="text-black dark:text-white/60 text-sm">
+                                            ·
+                                        </span>
+                                        <span className="text-black dark:text-white/60 text-sm">
+                                            {reply.timestamp}
+                                        </span>
+                                    </div>
+                                    <p className="text-black dark:text-white/80 text-sm mt-1">
+                                        {reply.content}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </Link>
+    );
+}
+
+
+export { XCard }
+
+demo.tsx
+import { XCard } from "@/components/ui/x-gradient-card"
+
+const XCardDummyData = {
+    authorName: "Dorian",
+    authorHandle: "dorian_baffier",
+    authorImage: "https://pbs.twimg.com/profile_images/1854916060807675904/KtBJsyWr_400x400.jpg",
+    content: [
+        "All components from KokonutUI can now be open in @v0 🎉",
+        "1. Click on 'Open in V0'",
+        "2. Customize with prompts",
+        "3. Deploy to your app",
+    ],
+    isVerified: true,
+    timestamp: "Jan 18, 2025",
+    reply: {
+        authorName: "shadcn",
+        authorHandle: "shadcn",
+        authorImage:
+            "https://pbs.twimg.com/profile_images/1593304942210478080/TUYae5z7_400x400.jpg",
+        content: "Awesome.",
+        isVerified: true,
+        timestamp: "Jan 18",
+    },
+};
+
+
+function XCardDemoDefault() {
+    return <XCard {...XCardDummyData} />
+}
+
+const XCardDummyDataTwo = {
+    authorName: "serafim",
+    authorHandle: "serafimcloud",
+    authorImage: "https://pbs.twimg.com/profile_images/1763123612905558017/fY93bvRq_400x400.jpg",
+    content: [
+        "I spent 70 days full-time curating the ultimate library of @shadcn/ui-like components.",
+        "And today, I'm launching it publicly.",
+        "Here's what it is:",
+        "• 730+ production-ready components from 50+ top design engineers",
+        "• Each component is yours to own - just like shadcn/ui",
+        "• Install everything with shadcn CLI: code, dependencies, hooks, global css and tailwind config extensions",
+        "It's also optimized for AI code editors like @lovable_dev, @stackblitz's bolt. new, and @vercel's @v0, with tailored prompts for effortless integration.",
+        "👉 http://21st.dev is live now. Build faster, own your code, and never struggle with UI setup again."
+    ],
+    isVerified: true,
+    timestamp: "Apr 6",
+    reply: {
+        authorName: "shadcn",
+        authorHandle: "shadcn",
+        authorImage: "https://pbs.twimg.com/profile_images/1593304942210478080/TUYae5z7_400x400.jpg",
+        content: "Great work. CLI support is a nice touch.",
+        isVerified: true,
+        timestamp: "Jan 9"
+    }
+};
+
+function XCardDemoTwo() {
+    return <XCard {...XCardDummyDataTwo} />
+}
+
+export { XCardDemoDefault, XCardDemoTwo }
+```
+
+Install NPM dependencies:
+```bash
+lucide-react
+```
+
+
+You are given a task to integrate an existing React component in the codebase
+
+The codebase should support:
+- shadcn project structure  
+- Tailwind CSS
+- Typescript
+
+If it doesn't, provide instructions on how to setup project via shadcn CLI, install Tailwind or Typescript.
+
+Determine the default path for components and styles. 
+If default path for components is not /components/ui, provide instructions on why it's important to create this folder
+Copy-paste this component to /components/ui folder:
+```tsx
+background-beams.tsx
+"use client"
+import React from "react"
+import { motion } from "framer-motion"
+import { cn } from "@/lib/utils"
+
+export const BackgroundBeams = React.memo(
+  ({ className }: { className?: string }) => {
+    const paths = [
+      "M-380 -189C-380 -189 -312 216 152 343C616 470 684 875 684 875",
+      "M-373 -197C-373 -197 -305 208 159 335C623 462 691 867 691 867",
+      "M-366 -205C-366 -205 -298 200 166 327C630 454 698 859 698 859",
+      "M-359 -213C-359 -213 -291 192 173 319C637 446 705 851 705 851",
+      "M-352 -221C-352 -221 -284 184 180 311C644 438 712 843 712 843",
+      "M-345 -229C-345 -229 -277 176 187 303C651 430 719 835 719 835",
+      "M-338 -237C-338 -237 -270 168 194 295C658 422 726 827 726 827",
+      "M-331 -245C-331 -245 -263 160 201 287C665 414 733 819 733 819",
+      "M-324 -253C-324 -253 -256 152 208 279C672 406 740 811 740 811",
+      "M-317 -261C-317 -261 -249 144 215 271C679 398 747 803 747 803",
+      "M-310 -269C-310 -269 -242 136 222 263C686 390 754 795 754 795",
+      "M-303 -277C-303 -277 -235 128 229 255C693 382 761 787 761 787",
+      "M-296 -285C-296 -285 -228 120 236 247C700 374 768 779 768 779",
+      "M-289 -293C-289 -293 -221 112 243 239C707 366 775 771 775 771",
+      "M-282 -301C-282 -301 -214 104 250 231C714 358 782 763 782 763",
+      "M-275 -309C-275 -309 -207 96 257 223C721 350 789 755 789 755",
+      "M-268 -317C-268 -317 -200 88 264 215C728 342 796 747 796 747",
+      "M-261 -325C-261 -325 -193 80 271 207C735 334 803 739 803 739",
+      "M-254 -333C-254 -333 -186 72 278 199C742 326 810 731 810 731",
+      "M-247 -341C-247 -341 -179 64 285 191C749 318 817 723 817 723",
+      "M-240 -349C-240 -349 -172 56 292 183C756 310 824 715 824 715",
+      "M-233 -357C-233 -357 -165 48 299 175C763 302 831 707 831 707",
+      "M-226 -365C-226 -365 -158 40 306 167C770 294 838 699 838 699",
+      "M-219 -373C-219 -373 -151 32 313 159C777 286 845 691 845 691",
+      "M-212 -381C-212 -381 -144 24 320 151C784 278 852 683 852 683",
+      "M-205 -389C-205 -389 -137 16 327 143C791 270 859 675 859 675",
+      "M-198 -397C-198 -397 -130 8 334 135C798 262 866 667 866 667",
+      "M-191 -405C-191 -405 -123 0 341 127C805 254 873 659 873 659",
+      "M-184 -413C-184 -413 -116 -8 348 119C812 246 880 651 880 651",
+      "M-177 -421C-177 -421 -109 -16 355 111C819 238 887 643 887 643",
+      "M-170 -429C-170 -429 -102 -24 362 103C826 230 894 635 894 635",
+      "M-163 -437C-163 -437 -95 -32 369 95C833 222 901 627 901 627",
+      "M-156 -445C-156 -445 -88 -40 376 87C840 214 908 619 908 619",
+      "M-149 -453C-149 -453 -81 -48 383 79C847 206 915 611 915 611",
+      "M-142 -461C-142 -461 -74 -56 390 71C854 198 922 603 922 603",
+      "M-135 -469C-135 -469 -67 -64 397 63C861 190 929 595 929 595",
+      "M-128 -477C-128 -477 -60 -72 404 55C868 182 936 587 936 587",
+      "M-121 -485C-121 -485 -53 -80 411 47C875 174 943 579 943 579",
+      "M-114 -493C-114 -493 -46 -88 418 39C882 166 950 571 950 571",
+      "M-107 -501C-107 -501 -39 -96 425 31C889 158 957 563 957 563",
+      "M-100 -509C-100 -509 -32 -104 432 23C896 150 964 555 964 555",
+      "M-93 -517C-93 -517 -25 -112 439 15C903 142 971 547 971 547",
+      "M-86 -525C-86 -525 -18 -120 446 7C910 134 978 539 978 539",
+      "M-79 -533C-79 -533 -11 -128 453 -1C917 126 985 531 985 531",
+      "M-72 -541C-72 -541 -4 -136 460 -9C924 118 992 523 992 523",
+      "M-65 -549C-65 -549 3 -144 467 -17C931 110 999 515 999 515",
+      "M-58 -557C-58 -557 10 -152 474 -25C938 102 1006 507 1006 507",
+      "M-51 -565C-51 -565 17 -160 481 -33C945 94 1013 499 1013 499",
+      "M-44 -573C-44 -573 24 -168 488 -41C952 86 1020 491 1020 491",
+      "M-37 -581C-37 -581 31 -176 495 -49C959 78 1027 483 1027 483",
+    ]
+    return (
+      <div
+        className={cn(
+          "absolute  h-full w-full inset-0  [mask-size:40px] [mask-repeat:no-repeat] flex items-center justify-center",
+          className,
+        )}
+      >
+        <svg
+          className=" z-0 h-full w-full pointer-events-none absolute "
+          width="100%"
+          height="100%"
+          viewBox="0 0 696 316"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M-380 -189C-380 -189 -312 216 152 343C616 470 684 875 684 875M-373 -197C-373 -197 -305 208 159 335C623 462 691 867 691 867M-366 -205C-366 -205 -298 200 166 327C630 454 698 859 698 859M-359 -213C-359 -213 -291 192 173 319C637 446 705 851 705 851M-352 -221C-352 -221 -284 184 180 311C644 438 712 843 712 843M-345 -229C-345 -229 -277 176 187 303C651 430 719 835 719 835M-338 -237C-338 -237 -270 168 194 295C658 422 726 827 726 827M-331 -245C-331 -245 -263 160 201 287C665 414 733 819 733 819M-324 -253C-324 -253 -256 152 208 279C672 406 740 811 740 811M-317 -261C-317 -261 -249 144 215 271C679 398 747 803 747 803M-310 -269C-310 -269 -242 136 222 263C686 390 754 795 754 795M-303 -277C-303 -277 -235 128 229 255C693 382 761 787 761 787M-296 -285C-296 -285 -228 120 236 247C700 374 768 779 768 779M-289 -293C-289 -293 -221 112 243 239C707 366 775 771 775 771M-282 -301C-282 -301 -214 104 250 231C714 358 782 763 782 763M-275 -309C-275 -309 -207 96 257 223C721 350 789 755 789 755M-268 -317C-268 -317 -200 88 264 215C728 342 796 747 796 747M-261 -325C-261 -325 -193 80 271 207C735 334 803 739 803 739M-254 -333C-254 -333 -186 72 278 199C742 326 810 731 810 731M-247 -341C-247 -341 -179 64 285 191C749 318 817 723 817 723M-240 -349C-240 -349 -172 56 292 183C756 310 824 715 824 715M-233 -357C-233 -357 -165 48 299 175C763 302 831 707 831 707M-226 -365C-226 -365 -158 40 306 167C770 294 838 699 838 699M-219 -373C-219 -373 -151 32 313 159C777 286 845 691 845 691M-212 -381C-212 -381 -144 24 320 151C784 278 852 683 852 683M-205 -389C-205 -389 -137 16 327 143C791 270 859 675 859 675M-198 -397C-198 -397 -130 8 334 135C798 262 866 667 866 667M-191 -405C-191 -405 -123 0 341 127C805 254 873 659 873 659M-184 -413C-184 -413 -116 -8 348 119C812 246 880 651 880 651M-177 -421C-177 -421 -109 -16 355 111C819 238 887 643 887 643M-170 -429C-170 -429 -102 -24 362 103C826 230 894 635 894 635M-163 -437C-163 -437 -95 -32 369 95C833 222 901 627 901 627M-156 -445C-156 -445 -88 -40 376 87C840 214 908 619 908 619M-149 -453C-149 -453 -81 -48 383 79C847 206 915 611 915 611M-142 -461C-142 -461 -74 -56 390 71C854 198 922 603 922 603M-135 -469C-135 -469 -67 -64 397 63C861 190 929 595 929 595M-128 -477C-128 -477 -60 -72 404 55C868 182 936 587 936 587M-121 -485C-121 -485 -53 -80 411 47C875 174 943 579 943 579M-114 -493C-114 -493 -46 -88 418 39C882 166 950 571 950 571M-107 -501C-107 -501 -39 -96 425 31C889 158 957 563 957 563M-100 -509C-100 -509 -32 -104 432 23C896 150 964 555 964 555M-93 -517C-93 -517 -25 -112 439 15C903 142 971 547 971 547M-86 -525C-86 -525 -18 -120 446 7C910 134 978 539 978 539M-79 -533C-79 -533 -11 -128 453 -1C917 126 985 531 985 531M-72 -541C-72 -541 -4 -136 460 -9C924 118 992 523 992 523M-65 -549C-65 -549 3 -144 467 -17C931 110 999 515 999 515M-58 -557C-58 -557 10 -152 474 -25C938 102 1006 507 1006 507M-51 -565C-51 -565 17 -160 481 -33C945 94 1013 499 1013 499M-44 -573C-44 -573 24 -168 488 -41C952 86 1020 491 1020 491M-37 -581C-37 -581 31 -176 495 -49C959 78 1027 483 1027 483M-30 -589C-30 -589 38 -184 502 -57C966 70 1034 475 1034 475M-23 -597C-23 -597 45 -192 509 -65C973 62 1041 467 1041 467M-16 -605C-16 -605 52 -200 516 -73C980 54 1048 459 1048 459M-9 -613C-9 -613 59 -208 523 -81C987 46 1055 451 1055 451M-2 -621C-2 -621 66 -216 530 -89C994 38 1062 443 1062 443M5 -629C5 -629 73 -224 537 -97C1001 30 1069 435 1069 435M12 -637C12 -637 80 -232 544 -105C1008 22 1076 427 1076 427M19 -645C19 -645 87 -240 551 -113C1015 14 1083 419 1083 419"
+            stroke="url(#paint0_radial_242_278)"
+            strokeOpacity="0.05"
+            strokeWidth="0.5"
+          ></path>
+
+          {paths.map((path, index) => (
+            <motion.path
+              key={`path-` + index}
+              d={path}
+              stroke={`url(#linearGradient-${index})`}
+              strokeOpacity="0.4"
+              strokeWidth="0.5"
+            ></motion.path>
+          ))}
+          <defs>
+            {paths.map((path, index) => (
+              <motion.linearGradient
+                id={`linearGradient-${index}`}
+                key={`gradient-${index}`}
+                initial={{
+                  x1: "0%",
+                  x2: "0%",
+                  y1: "0%",
+                  y2: "0%",
+                }}
+                animate={{
+                  x1: ["0%", "100%"],
+                  x2: ["0%", "95%"],
+                  y1: ["0%", "100%"],
+                  y2: ["0%", `${93 + Math.random() * 8}%`],
+                }}
+                transition={{
+                  duration: Math.random() * 10 + 10,
+                  ease: "easeInOut",
+                  repeat: Infinity,
+                  delay: Math.random() * 10,
+                }}
+              >
+                <stop stopColor="#18CCFC" stopOpacity="0"></stop>
+                <stop stopColor="#18CCFC"></stop>
+                <stop offset="32.5%" stopColor="#6344F5"></stop>
+                <stop offset="100%" stopColor="#AE48FF" stopOpacity="0"></stop>
+              </motion.linearGradient>
+            ))}
+
+            <radialGradient
+              id="paint0_radial_242_278"
+              cx="0"
+              cy="0"
+              r="1"
+              gradientUnits="userSpaceOnUse"
+              gradientTransform="translate(352 34) rotate(90) scale(555 1560.62)"
+            >
+              <stop offset="0.0666667" stopColor="var(--neutral-300)"></stop>
+              <stop offset="0.243243" stopColor="var(--neutral-300)"></stop>
+              <stop offset="0.43594" stopColor="white" stopOpacity="0"></stop>
+            </radialGradient>
+          </defs>
+        </svg>
+      </div>
+    )
+  },
+)
+
+BackgroundBeams.displayName = "BackgroundBeams"
+
+
+demo.tsx
+"use client";
+import React from "react";
+import { BackgroundBeams } from "@/components/ui/background-beams";
+import { Input } from "@/components/ui/input";
+
+function BackgroundBeamsDemo() {
+  return (
+    <div className="h-[40rem] w-full rounded-md bg-background relative flex flex-col items-center justify-center antialiased">
+      <div className="max-w-2xl mx-auto p-4">
+        <h1 className="relative z-10 text-lg md:text-7xl bg-clip-text text-transparent bg-gradient-to-b from-foreground to-muted-foreground text-center font-sans font-bold">
+          Join the waitlist
+        </h1>
+        <p></p>
+        <p className="text-muted-foreground max-w-lg mx-auto my-2 text-sm text-center relative z-10">
+          Welcome to MailJet, the best transactional email service on the web.
+          We provide reliable, scalable, and customizable email solutions for
+          your business. Whether you&apos;re sending order confirmations,
+          password reset emails, or promotional campaigns, MailJet has got you
+          covered.
+        </p>
+        <Input
+          type="email"
+          placeholder="hi@manuarora.in"
+          className="w-full mt-4 relative z-10"
+        />
+      </div>
+      <BackgroundBeams />
+    </div>
+  );
+}
+
+export { BackgroundBeamsDemo };
+```
+
+Copy-paste these files for dependencies:
+```tsx
+shadcn/input
+import * as React from "react"
+
+import { cn } from "@/lib/utils"
+
+export interface InputProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {}
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type, ...props }, ref) => {
+    return (
+      <input
+        type={type}
+        className={cn(
+          "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+          className
+        )}
+        ref={ref}
+        {...props}
+      />
+    )
+  }
+)
+Input.displayName = "Input"
+
+export { Input }
+
+```
+
+Install NPM dependencies:
+```bash
+framer-motion
+```
+
+
+You are given a task to integrate an existing React component in the codebase
+
+The codebase should support:
+- shadcn project structure  
+- Tailwind CSS
+- Typescript
+
+If it doesn't, provide instructions on how to setup project via shadcn CLI, install Tailwind or Typescript.
+
+Determine the default path for components and styles. 
+If default path for components is not /components/ui, provide instructions on why it's important to create this folder
+Copy-paste this component to /components/ui folder:
+```tsx
+hover-button.tsx
+"use client"
+
+import * as React from "react"
+import { cn } from "@/lib/utils"
+
+interface HoverButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  children: React.ReactNode
+}
+
+const HoverButton = React.forwardRef<HTMLButtonElement, HoverButtonProps>(
+  ({ className, children, ...props }, ref) => {
+    const buttonRef = React.useRef<HTMLButtonElement>(null)
+    const [isListening, setIsListening] = React.useState(false)
+    const [circles, setCircles] = React.useState<Array<{
+      id: number
+      x: number
+      y: number
+      color: string
+      fadeState: "in" | "out" | null
+    }>>([])
+    const lastAddedRef = React.useRef(0)
+
+    const createCircle = React.useCallback((x: number, y: number) => {
+      const buttonWidth = buttonRef.current?.offsetWidth || 0
+      const xPos = x / buttonWidth
+      const color = `linear-gradient(to right, var(--circle-start) ${xPos * 100}%, var(--circle-end) ${
+        xPos * 100
+      }%)`
+
+      setCircles((prev) => [
+        ...prev,
+        { id: Date.now(), x, y, color, fadeState: null },
+      ])
+    }, [])
+
+    const handlePointerMove = React.useCallback(
+      (event: React.PointerEvent<HTMLButtonElement>) => {
+        if (!isListening) return
+        
+        const currentTime = Date.now()
+        if (currentTime - lastAddedRef.current > 100) {
+          lastAddedRef.current = currentTime
+          const rect = event.currentTarget.getBoundingClientRect()
+          const x = event.clientX - rect.left
+          const y = event.clientY - rect.top
+          createCircle(x, y)
+        }
+      },
+      [isListening, createCircle]
+    )
+
+    const handlePointerEnter = React.useCallback(() => {
+      setIsListening(true)
+    }, [])
+
+    const handlePointerLeave = React.useCallback(() => {
+      setIsListening(false)
+    }, [])
+
+    React.useEffect(() => {
+      circles.forEach((circle) => {
+        if (!circle.fadeState) {
+          setTimeout(() => {
+            setCircles((prev) =>
+              prev.map((c) =>
+                c.id === circle.id ? { ...c, fadeState: "in" } : c
+              )
+            )
+          }, 0)
+
+          setTimeout(() => {
+            setCircles((prev) =>
+              prev.map((c) =>
+                c.id === circle.id ? { ...c, fadeState: "out" } : c
+              )
+            )
+          }, 1000)
+
+          setTimeout(() => {
+            setCircles((prev) => prev.filter((c) => c.id !== circle.id))
+          }, 2200)
+        }
+      })
+    }, [circles])
+
+    return (
+      <button
+        ref={buttonRef}
+        className={cn(
+          "relative isolate px-8 py-3 rounded-3xl",
+          "text-foreground font-medium text-base leading-6",
+          "backdrop-blur-lg bg-[rgba(43,55,80,0.1)]",
+          "cursor-pointer overflow-hidden",
+          "before:content-[''] before:absolute before:inset-0",
+          "before:rounded-[inherit] before:pointer-events-none",
+          "before:z-[1]",
+          "before:shadow-[inset_0_0_0_1px_rgba(170,202,255,0.2),inset_0_0_16px_0_rgba(170,202,255,0.1),inset_0_-3px_12px_0_rgba(170,202,255,0.15),0_1px_3px_0_rgba(0,0,0,0.50),0_4px_12px_0_rgba(0,0,0,0.45)]",
+          "before:mix-blend-multiply before:transition-transform before:duration-300",
+          "active:before:scale-[0.975]",
+          className
+        )}
+        onPointerMove={handlePointerMove}
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave}
+        {...props}
+        style={{
+          "--circle-start": "var(--tw-gradient-from, #a0d9f8)",
+          "--circle-end": "var(--tw-gradient-to, #3a5bbf)",
+        }}
+      >
+        {circles.map(({ id, x, y, color, fadeState }) => (
+          <div
+            key={id}
+            className={cn(
+              "absolute w-3 h-3 -translate-x-1/2 -translate-y-1/2 rounded-full",
+              "blur-lg pointer-events-none z-[-1] transition-opacity duration-300",
+              fadeState === "in" && "opacity-75",
+              fadeState === "out" && "opacity-0 duration-[1.2s]",
+              !fadeState && "opacity-0"
+            )}
+            style={{
+              left: x,
+              top: y,
+              background: color,
+            }}
+          />
+        ))}
+        {children}
+      </button>
+    )
+  }
+)
+
+HoverButton.displayName = "HoverButton"
+
+export { HoverButton }
+
+demo.tsx
+import { HoverButton } from "@/components/ui/hover-button"
+
+function HoverButtonDemo() {
+  return (
+    <div className="min-h-screen grid place-items-center">
+      <HoverButton>Get Started</HoverButton>
+    </div>
+  )
+}
+
+export default { HoverButtonDemo };
+```
+
+
+You are given a task to integrate an existing React component in the codebase
+
+The codebase should support:
+- shadcn project structure  
+- Tailwind CSS
+- Typescript
+
+If it doesn't, provide instructions on how to setup project via shadcn CLI, install Tailwind or Typescript.
+
+Determine the default path for components and styles. 
+If default path for components is not /components/ui, provide instructions on why it's important to create this folder
+Copy-paste this component to /components/ui folder:
+```tsx
+call-to-action.tsx
+import { MoveRight, PhoneCall } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+
+function CTA() {
+  return (
+    <div className="w-full py-20 lg:py-40">
+      <div className="container mx-auto">
+        <div className="flex flex-col text-center bg-muted rounded-md p-4 lg:p-14 gap-8 items-center">
+          <div>
+            <Badge>Get started</Badge>
+          </div>
+          <div className="flex flex-col gap-2">
+            <h3 className="text-3xl md:text-5xl tracking-tighter max-w-xl font-regular">
+              Try our platform today!
+            </h3>
+            <p className="text-lg leading-relaxed tracking-tight text-muted-foreground max-w-xl">
+              Managing a small business today is already tough. Avoid further
+              complications by ditching outdated, tedious trade methods. Our goal
+              is to streamline SMB trade, making it easier and faster than ever.
+            </p>
+          </div>
+          <div className="flex flex-row gap-4">
+            <Button className="gap-4" variant="outline">
+              Jump on a call <PhoneCall className="w-4 h-4" />
+            </Button>
+            <Button className="gap-4">
+              Sign up here <MoveRight className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export { CTA };
+
+
+demo.tsx
+import { CTA } from "@/components/ui/call-to-action"
+
+function CTADemo() {
+  return (
+    <div className="w-full">
+      <CTA />
+    </div>
+  );
+}
+
+export { CTADemo };
+```
+
+Copy-paste these files for dependencies:
+```tsx
+shadcn/badge
+import * as React from "react"
+import { cva, type VariantProps } from "class-variance-authority"
+
+import { cn } from "@/lib/utils"
+
+const badgeVariants = cva(
+  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  {
+    variants: {
+      variant: {
+        default:
+          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
+        secondary:
+          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        destructive:
+          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
+        outline: "text-foreground",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  },
+)
+
+export interface BadgeProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof badgeVariants> {}
+
+function Badge({ className, variant, ...props }: BadgeProps) {
+  return (
+    <div className={cn(badgeVariants({ variant }), className)} {...props} />
+  )
+}
+
+export { Badge, badgeVariants }
+
+```
+```tsx
+shadcn/button
+import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
+import { cva, type VariantProps } from "class-variance-authority"
+
+import { cn } from "@/lib/utils"
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline:
+          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        default: "h-10 px-4 py-2",
+        sm: "h-9 rounded-md px-3",
+        lg: "h-11 rounded-md px-8",
+        icon: "h-10 w-10",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  },
+)
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean
+}
+
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button"
+    return (
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      />
+    )
+  },
+)
+Button.displayName = "Button"
+
+export { Button, buttonVariants }
+
+```
+
+Install NPM dependencies:
+```bash
+lucide-react, class-variance-authority, @radix-ui/react-slot
+```
+
+
+You are given a task to integrate an existing React component in the codebase
+
+The codebase should support:
+- shadcn project structure  
+- Tailwind CSS
+- Typescript
+
+If it doesn't, provide instructions on how to setup project via shadcn CLI, install Tailwind or Typescript.
+
+Determine the default path for components and styles. 
+If default path for components is not /components/ui, provide instructions on why it's important to create this folder
+Copy-paste this component to /components/ui folder:
+```tsx
+about-us-section.tsx
+"use client"
+
+import type React from "react"
+
+import { useState, useEffect, useRef } from "react"
+import {
+  Pen,
+  PaintBucket,
+  Home,
+  Ruler,
+  PenTool,
+  Building2,
+  Award,
+  Users,
+  Calendar,
+  CheckCircle,
+  Sparkles,
+  Star,
+  ArrowRight,
+  Zap,
+  TrendingUp,
+} from "lucide-react"
+import { motion, useScroll, useTransform, useInView, useSpring } from "framer-motion"
+
+export default function AboutUsSection() {
+  const [isVisible, setIsVisible] = useState(false)
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const statsRef = useRef<HTMLDivElement>(null)
+  const isInView = useInView(sectionRef, { once: false, amount: 0.1 })
+  const isStatsInView = useInView(statsRef, { once: false, amount: 0.3 })
+
+  // Parallax effect for decorative elements
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  })
+
+  const y1 = useTransform(scrollYProgress, [0, 1], [0, -50])
+  const y2 = useTransform(scrollYProgress, [0, 1], [0, 50])
+  const rotate1 = useTransform(scrollYProgress, [0, 1], [0, 20])
+  const rotate2 = useTransform(scrollYProgress, [0, 1], [0, -20])
+
+  useEffect(() => {
+    setIsVisible(true)
+  }, [])
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+        delayChildren: 0.3,
+      },
+    },
+  }
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { duration: 0.6, ease: "easeOut" },
+    },
+  }
+
+  const services = [
+    {
+      icon: <Pen className="w-6 h-6" />,
+      secondaryIcon: <Sparkles className="w-4 h-4 absolute -top-1 -right-1 text-[#A9BBC8]" />,
+      title: "Interior",
+      description:
+        "Transform your living spaces with our expert interior design services. We blend functionality and aesthetics to create spaces that reflect your unique style and personality.",
+      position: "left",
+    },
+    {
+      icon: <Home className="w-6 h-6" />,
+      secondaryIcon: <CheckCircle className="w-4 h-4 absolute -top-1 -right-1 text-[#A9BBC8]" />,
+      title: "Exterior",
+      description:
+        "Make a lasting impression with stunning exterior designs that enhance curb appeal and create harmonious connections between architecture and landscape.",
+      position: "left",
+    },
+    {
+      icon: <PenTool className="w-6 h-6" />,
+      secondaryIcon: <Star className="w-4 h-4 absolute -top-1 -right-1 text-[#A9BBC8]" />,
+      title: "Design",
+      description:
+        "Our innovative design process combines creativity with practicality, resulting in spaces that are both beautiful and functional for everyday living.",
+      position: "left",
+    },
+    {
+      icon: <PaintBucket className="w-6 h-6" />,
+      secondaryIcon: <Sparkles className="w-4 h-4 absolute -top-1 -right-1 text-[#A9BBC8]" />,
+      title: "Decoration",
+      description:
+        "Elevate your space with our curated decoration services. From color schemes to textiles and accessories, we perfect every detail to bring your vision to life.",
+      position: "right",
+    },
+    {
+      icon: <Ruler className="w-6 h-6" />,
+      secondaryIcon: <CheckCircle className="w-4 h-4 absolute -top-1 -right-1 text-[#A9BBC8]" />,
+      title: "Planning",
+      description:
+        "Our meticulous planning process ensures every project runs smoothly from concept to completion, with careful attention to timelines, budgets, and requirements.",
+      position: "right",
+    },
+    {
+      icon: <Building2 className="w-6 h-6" />,
+      secondaryIcon: <Star className="w-4 h-4 absolute -top-1 -right-1 text-[#A9BBC8]" />,
+      title: "Execution",
+      description:
+        "Watch your dream space come to life through our flawless execution. Our skilled team handles every aspect of implementation with precision and care.",
+      position: "right",
+    },
+  ]
+
+  const stats = [
+    { icon: <Award />, value: 150, label: "Projects Completed", suffix: "+" },
+    { icon: <Users />, value: 1200, label: "Happy Clients", suffix: "+" },
+    { icon: <Calendar />, value: 12, label: "Years Experience", suffix: "" },
+    { icon: <TrendingUp />, value: 98, label: "Satisfaction Rate", suffix: "%" },
+  ]
+
+  return (
+    <section
+      id="about-section"
+      ref={sectionRef}
+      className="w-full py-24 px-4 bg-gradient-to-b from-[#F2F2EB] to-[#F8F8F2] text-[#202e44] overflow-hidden relative"
+    >
+      {/* Decorative background elements */}
+      <motion.div
+        className="absolute top-20 left-10 w-64 h-64 rounded-full bg-[#88734C]/5 blur-3xl"
+        style={{ y: y1, rotate: rotate1 }}
+      />
+      <motion.div
+        className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-[#A9BBC8]/5 blur-3xl"
+        style={{ y: y2, rotate: rotate2 }}
+      />
+      <motion.div
+        className="absolute top-1/2 left-1/4 w-4 h-4 rounded-full bg-[#88734C]/30"
+        animate={{
+          y: [0, -15, 0],
+          opacity: [0.5, 1, 0.5],
+        }}
+        transition={{
+          duration: 3,
+          repeat: Number.POSITIVE_INFINITY,
+          ease: "easeInOut",
+        }}
+      />
+      <motion.div
+        className="absolute bottom-1/3 right-1/4 w-6 h-6 rounded-full bg-[#A9BBC8]/30"
+        animate={{
+          y: [0, 20, 0],
+          opacity: [0.5, 1, 0.5],
+        }}
+        transition={{
+          duration: 4,
+          repeat: Number.POSITIVE_INFINITY,
+          ease: "easeInOut",
+          delay: 1,
+        }}
+      />
+
+      <motion.div
+        className="container mx-auto max-w-6xl relative z-10"
+        initial="hidden"
+        animate={isInView ? "visible" : "hidden"}
+        variants={containerVariants}
+      >
+        <motion.div className="flex flex-col items-center mb-6" variants={itemVariants}>
+          <motion.span
+            className="text-[#88734C] font-medium mb-2 flex items-center gap-2"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <Zap className="w-4 h-4" />
+            DISCOVER OUR STORY
+          </motion.span>
+          <h2 className="text-4xl md:text-5xl font-light mb-4 text-center">About Us</h2>
+          <motion.div
+            className="w-24 h-1 bg-[#88734C]"
+            initial={{ width: 0 }}
+            animate={{ width: 96 }}
+            transition={{ duration: 1, delay: 0.5 }}
+          ></motion.div>
+        </motion.div>
+
+        <motion.p className="text-center max-w-2xl mx-auto mb-16 text-[#202e44]/80" variants={itemVariants}>
+          We are a passionate team of designers and architects dedicated to creating beautiful, functional spaces that
+          inspire and elevate everyday living. With attention to detail and commitment to excellence, we transform
+          visions into reality.
+        </motion.p>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+          {/* Left Column */}
+          <div className="space-y-16">
+            {services
+              .filter((service) => service.position === "left")
+              .map((service, index) => (
+                <ServiceItem
+                  key={`left-${index}`}
+                  icon={service.icon}
+                  secondaryIcon={service.secondaryIcon}
+                  title={service.title}
+                  description={service.description}
+                  variants={itemVariants}
+                  delay={index * 0.2}
+                  direction="left"
+                />
+              ))}
+          </div>
+
+          {/* Center Image */}
+          <div className="flex justify-center items-center order-first md:order-none mb-8 md:mb-0">
+            <motion.div className="relative w-full max-w-xs" variants={itemVariants}>
+              <motion.div
+                className="rounded-md overflow-hidden shadow-xl"
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+                whileHover={{ scale: 1.03, transition: { duration: 0.3 } }}
+              >
+                <img
+                  src="https://images.unsplash.com/photo-1747582411588-f9b4acabe995?q=80&w=3027&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                  alt="Modern House"
+                  className="w-full h-full object-cover"
+                />
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-t from-[#202e44]/50 to-transparent flex items-end justify-center p-4"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.8, delay: 0.9 }}
+                >
+                  <motion.button
+                    className="bg-white text-[#202e44] px-4 py-2 rounded-full flex items-center gap-2 text-sm font-medium"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Our Portfolio <ArrowRight className="w-4 h-4" />
+                  </motion.button>
+                </motion.div>
+              </motion.div>
+              <motion.div
+                className="absolute inset-0 border-4 border-[#A9BBC8] rounded-md -m-3 z-[-1]"
+                initial={{ opacity: 0, scale: 1.1 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8, delay: 0.6 }}
+              ></motion.div>
+
+              {/* Floating accent elements */}
+              <motion.div
+                className="absolute -top-4 -right-8 w-16 h-16 rounded-full bg-[#88734C]/10"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.9 }}
+                style={{ y: y1 }}
+              ></motion.div>
+              <motion.div
+                className="absolute -bottom-6 -left-10 w-20 h-20 rounded-full bg-[#A9BBC8]/15"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 1.1 }}
+                style={{ y: y2 }}
+              ></motion.div>
+
+              {/* Additional decorative elements */}
+              <motion.div
+                className="absolute -top-10 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-[#88734C]"
+                animate={{
+                  y: [0, -10, 0],
+                  opacity: [0.5, 1, 0.5],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Number.POSITIVE_INFINITY,
+                  ease: "easeInOut",
+                }}
+              ></motion.div>
+              <motion.div
+                className="absolute -bottom-12 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-[#A9BBC8]"
+                animate={{
+                  y: [0, 10, 0],
+                  opacity: [0.5, 1, 0.5],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Number.POSITIVE_INFINITY,
+                  ease: "easeInOut",
+                  delay: 0.5,
+                }}
+              ></motion.div>
+            </motion.div>
+          </div>
+
+          {/* Right Column */}
+          <div className="space-y-16">
+            {services
+              .filter((service) => service.position === "right")
+              .map((service, index) => (
+                <ServiceItem
+                  key={`right-${index}`}
+                  icon={service.icon}
+                  secondaryIcon={service.secondaryIcon}
+                  title={service.title}
+                  description={service.description}
+                  variants={itemVariants}
+                  delay={index * 0.2}
+                  direction="right"
+                />
+              ))}
+          </div>
+        </div>
+
+        {/* Stats Section */}
+        <motion.div
+          ref={statsRef}
+          className="mt-24 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
+          initial="hidden"
+          animate={isStatsInView ? "visible" : "hidden"}
+          variants={containerVariants}
+        >
+          {stats.map((stat, index) => (
+            <StatCounter
+              key={index}
+              icon={stat.icon}
+              value={stat.value}
+              label={stat.label}
+              suffix={stat.suffix}
+              delay={index * 0.1}
+            />
+          ))}
+        </motion.div>
+
+        {/* CTA Section */}
+        <motion.div
+          className="mt-20 bg-[#202e44] text-white p-8 rounded-xl flex flex-col md:flex-row items-center justify-between gap-6"
+          initial={{ opacity: 0, y: 30 }}
+          animate={isStatsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+        >
+          <div className="flex-1">
+            <h3 className="text-2xl font-medium mb-2">Ready to transform your space?</h3>
+            <p className="text-white/80">Let's create something beautiful together.</p>
+          </div>
+          <motion.button
+            className="bg-[#88734C] hover:bg-[#88734C]/90 text-white px-6 py-3 rounded-lg flex items-center gap-2 font-medium transition-colors"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Get Started <ArrowRight className="w-4 h-4" />
+          </motion.button>
+        </motion.div>
+      </motion.div>
+    </section>
+  )
+}
+
+interface ServiceItemProps {
+  icon: React.ReactNode
+  secondaryIcon?: React.ReactNode
+  title: string
+  description: string
+  variants: {
+    hidden: { opacity: number; y?: number }
+    visible: { opacity: number; y?: number; transition: { duration: number; ease: string } }
+  }
+  delay: number
+  direction: "left" | "right"
+}
+
+function ServiceItem({ icon, secondaryIcon, title, description, variants, delay, direction }: ServiceItemProps) {
+  return (
+    <motion.div
+      className="flex flex-col group"
+      variants={variants}
+      transition={{ delay }}
+      whileHover={{ y: -5, transition: { duration: 0.2 } }}
+    >
+      <motion.div
+        className="flex items-center gap-3 mb-3"
+        initial={{ x: direction === "left" ? -20 : 20, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.6, delay: delay + 0.2 }}
+      >
+        <motion.div
+          className="text-[#88734C] bg-[#88734C]/10 p-3 rounded-lg transition-colors duration-300 group-hover:bg-[#88734C]/20 relative"
+          whileHover={{ rotate: [0, -10, 10, -5, 0], transition: { duration: 0.5 } }}
+        >
+          {icon}
+          {secondaryIcon}
+        </motion.div>
+        <h3 className="text-xl font-medium text-[#202e44] group-hover:text-[#88734C] transition-colors duration-300">
+          {title}
+        </h3>
+      </motion.div>
+      <motion.p
+        className="text-sm text-[#202e44]/80 leading-relaxed pl-12"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6, delay: delay + 0.4 }}
+      >
+        {description}
+      </motion.p>
+      <motion.div
+        className="mt-3 pl-12 flex items-center text-[#88734C] text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0 }}
+      >
+        <span className="flex items-center gap-1">
+          Learn more <ArrowRight className="w-3 h-3" />
+        </span>
+      </motion.div>
+    </motion.div>
+  )
+}
+
+interface StatCounterProps {
+  icon: React.ReactNode
+  value: number
+  label: string
+  suffix: string
+  delay: number
+}
+
+function StatCounter({ icon, value, label, suffix, delay }: StatCounterProps) {
+  const countRef = useRef(null)
+  const isInView = useInView(countRef, { once: false })
+  const [hasAnimated, setHasAnimated] = useState(false)
+
+  const springValue = useSpring(0, {
+    stiffness: 50,
+    damping: 10,
+  })
+
+  useEffect(() => {
+    if (isInView && !hasAnimated) {
+      springValue.set(value)
+      setHasAnimated(true)
+    } else if (!isInView && hasAnimated) {
+      springValue.set(0)
+      setHasAnimated(false)
+    }
+  }, [isInView, value, springValue, hasAnimated])
+
+  const displayValue = useTransform(springValue, (latest) => Math.floor(latest))
+
+  return (
+    <motion.div
+      className="bg-white/50 backdrop-blur-sm p-6 rounded-xl flex flex-col items-center text-center group hover:bg-white transition-colors duration-300"
+      variants={{
+        hidden: { opacity: 0, y: 20 },
+        visible: {
+          opacity: 1,
+          y: 0,
+          transition: { duration: 0.6, delay },
+        },
+      }}
+      whileHover={{ y: -5, transition: { duration: 0.2 } }}
+    >
+      <motion.div
+        className="w-14 h-14 rounded-full bg-[#202e44]/5 flex items-center justify-center mb-4 text-[#88734C] group-hover:bg-[#88734C]/10 transition-colors duration-300"
+        whileHover={{ rotate: 360, transition: { duration: 0.8 } }}
+      >
+        {icon}
+      </motion.div>
+      <motion.div ref={countRef} className="text-3xl font-bold text-[#202e44] flex items-center">
+        <motion.span>{displayValue}</motion.span>
+        <span>{suffix}</span>
+      </motion.div>
+      <p className="text-[#202e44]/70 text-sm mt-1">{label}</p>
+      <motion.div className="w-10 h-0.5 bg-[#88734C] mt-3 group-hover:w-16 transition-all duration-300" />
+    </motion.div>
+  )
+}
+
+
+
+demo.tsx
+import AboutUsSection from "@/components/ui/about-us-section";
+
+const DemoOne = () => {
+  return <AboutUsSection />;
+};
+
+export { DemoOne };
+
+```
+
+Install NPM dependencies:
+```bash
+lucide-react, framer-motion
+```
+
+
+You are given a task to integrate an existing React component in the codebase
+
+The codebase should support:
+- shadcn project structure  
+- Tailwind CSS
+- Typescript
+
+If it doesn't, provide instructions on how to setup project via shadcn CLI, install Tailwind or Typescript.
+
+Determine the default path for components and styles. 
+If default path for components is not /components/ui, provide instructions on why it's important to create this folder
+Copy-paste this component to /components/ui folder:
+```tsx
+diced-hero-section.tsx
+"use client";
+import React, { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
+import { ChronicleButton } from './chronicle-button';
+
+interface TextStyle {
+  color?: string;
+  fontSize?: string;
+  gradient?: string;
+}
+interface ButtonStyle {
+  backgroundColor?: string;
+  color?: string;
+  borderRadius?: string;
+  hoverColor?: string;
+  hoverForeground?: string; // NEW: color of text on hover
+}
+interface SlideContent {
+  title: string;
+  image: string;
+}
+interface DicedHeroSectionProps {
+  topText: string;
+  mainText: string;
+  subMainText: string;
+  buttonText: string;
+  slides: SlideContent[];
+  onMainButtonClick?: () => void;
+  onGridImageHover?: (index: number) => void;
+  onGridImageClick?: (index: number) => void;
+  topTextStyle?: TextStyle;
+  mainTextStyle?: TextStyle;
+  subMainTextStyle?: TextStyle;
+  buttonStyle?: ButtonStyle;
+  componentBorderRadius?: string;
+  backgroundColor?: string;
+  separatorColor?: string;
+  maxContentWidth?: string;
+  mobileBreakpoint?: number;
+  fontFamily?: string;
+  isRTL?: boolean;
+}
+
+export const DicedHeroSection: React.FC<DicedHeroSectionProps> = ({
+  topText,
+  mainText,
+  subMainText,
+  buttonText,
+  slides,
+  onMainButtonClick,
+  onGridImageHover,
+  onGridImageClick,
+  topTextStyle,
+  mainTextStyle,
+  subMainTextStyle,
+  buttonStyle = {},
+  componentBorderRadius = '0px',
+  backgroundColor,
+  separatorColor = '#005baa',
+  maxContentWidth = '1536px',
+  mobileBreakpoint = 1000,
+  fontFamily = 'inherit',
+  isRTL = false,
+}) => {
+  const [isMobile, setIsMobile] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const isRTLCheck = (text: string): boolean => {
+    return /[\u0590-\u05FF\u0600-\u06FF\u0700-\u074F]/.test(text);
+  };
+
+  useEffect(() => {
+    const checkMobile = () => {
+      if (containerRef.current) {
+        setIsMobile(containerRef.current.offsetWidth < mobileBreakpoint);
+      }
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, [mobileBreakpoint]);
+
+  const getGradientStyle = (gradient?: string) => {
+    if (gradient) {
+      return {
+        backgroundImage: gradient,
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+      };
+    }
+    return {};
+  };
+
+  return (
+    <main
+      ref={containerRef}
+      style={{
+        borderRadius: componentBorderRadius,
+        backgroundColor,
+        padding: '2rem',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: isMobile ? 'column' : isRTL ? 'row-reverse' : 'row',
+        justifyContent: 'center',
+        alignItems: 'stretch',
+        width: '100%',
+        maxWidth: maxContentWidth,
+        margin: '0 auto',
+        minHeight: 'auto',
+        height: 'auto',
+        fontFamily,
+        position: 'relative',
+      }}
+    >
+      <div
+        style={{
+          flex: 1,
+          marginRight: isMobile ? 0 : isRTL ? 0 : '2rem',
+          marginLeft: isMobile ? 0 : isRTL ? '2rem' : 0,
+          textAlign: isMobile ? 'center' : isRTL ? 'right' : 'left',
+          alignItems: isMobile ? 'center' : isRTL ? 'flex-end' : 'flex-start',
+          maxWidth: isMobile ? '100%' : '50%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          zIndex: 1,
+          paddingBottom: isMobile ? '2rem' : 0,
+        }}
+      >
+        <div>
+          <motion.span
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            style={{
+              ...topTextStyle,
+              ...getGradientStyle(topTextStyle?.gradient),
+              direction: isRTLCheck(topText) ? 'rtl' : 'ltr',
+              textAlign: isRTLCheck(topText) ? 'right' : 'left',
+            }}
+          >
+            {topText}
+          </motion.span>
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            style={{
+              ...mainTextStyle,
+              direction: isRTLCheck(mainText) ? 'rtl' : 'ltr',
+              textAlign: isMobile
+                ? 'center'
+                : isRTLCheck(mainText)
+                ? 'right'
+                : 'left',
+              fontSize: mainTextStyle?.fontSize,
+            }}
+          >
+            <motion.span
+              style={{
+                ...getGradientStyle(mainTextStyle?.gradient),
+                display: 'inline-block',
+              }}
+            >
+              {mainText}
+            </motion.span>
+          </motion.h1>
+          <motion.hr
+            initial={{ width: 0 }}
+            animate={{ width: '6.25rem' }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            style={{
+              height: '0.25rem',
+              background: separatorColor,
+              border: 'none',
+              margin: isMobile
+                ? '1.125rem auto 1.875rem'
+                : isRTLCheck(mainText)
+                ? '1.125rem 0 1.875rem auto'
+                : '1.125rem 0 1.875rem',
+              alignSelf: isMobile
+                ? 'center'
+                : isRTLCheck(mainText)
+                ? 'flex-end'
+                : 'flex-start',
+            }}
+          />
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            style={{
+              ...subMainTextStyle,
+              ...getGradientStyle(subMainTextStyle?.gradient),
+              direction: isRTLCheck(subMainText) ? 'rtl' : 'ltr',
+              textAlign: isRTLCheck(subMainText) ? 'right' : 'left',
+            }}
+          >
+            {subMainText}
+          </motion.p>
+        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          style={{
+            marginTop: '1rem',
+            display: 'flex',
+            justifyContent: isMobile
+              ? 'center'
+              : isRTL
+              ? 'flex-end'
+              : 'flex-start',
+          }}
+        >
+          <ChronicleButton
+            text={buttonText}
+            onClick={onMainButtonClick}
+            hoverColor={buttonStyle?.hoverColor}
+            hoverForeground={buttonStyle?.hoverForeground ?? '#fff'} // NEW
+            borderRadius={buttonStyle?.borderRadius}
+            fontFamily={fontFamily}
+            customBackground={buttonStyle?.backgroundColor}
+            customForeground={buttonStyle?.color}
+          />
+        </motion.div>
+      </div>
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: isRTL ? 'flex-start' : 'flex-end',
+          position: 'relative',
+          width: isMobile ? '100%' : '50%',
+          paddingLeft: isMobile ? 0 : isRTL ? 0 : '2rem',
+          paddingRight: isMobile ? 0 : isRTL ? '2rem' : 0,
+          height: 'auto',
+        }}
+      >
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            gap: '20px',
+            width: '100%',
+            aspectRatio: '1 / 1',
+          }}
+        >
+          {[slides[3], slides[2], slides[1], slides[0]].map((slide, index) => (
+            <div
+              key={index}
+              style={{
+                position: 'relative',
+                width: '100%',
+                paddingBottom: '100%',
+                overflow: 'hidden',
+                borderRadius: '20px',
+              }}
+            >
+              <img
+                src={slide.image}
+                alt={slide.title}
+                className={`warped-image ${
+                  ['bottom-right', 'bottom-left', 'top-right', 'top-left'][
+                    index
+                  ]
+                }`}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  cursor: 'pointer',
+                }}
+                onClick={() => onGridImageClick && onGridImageClick(index)}
+                onMouseEnter={() => onGridImageHover && onGridImageHover(index)}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+      <style jsx>{`
+        .warped-image {
+          --r: 20px;
+          --s: 40px;
+          --x: 25px;
+          --y: 5px;
+        }
+        .top-right {
+          --_m:/calc(2*var(--r)) calc(2*var(--r)) radial-gradient(#000 70%,#0000 72%);
+          --_g:conic-gradient(at calc(100% - var(--r)) var(--r),#0000 25%,#000 0);
+          --_d:(var(--s) + var(--r));
+          mask: calc(100% - var(--_d) - var(--x)) 0 var(--_m), 100% calc(var(--_d) + var(--y)) var(--_m), radial-gradient(var(--s) at 100% 0,#0000 99%,#000 calc(100% + 1px)) calc(-1*var(--r) - var(--x)) calc(var(--r) + var(--y)), var(--_g) calc(-1*var(--_d) - var(--x)) 0, var(--_g) 0 calc(var(--_d) + var(--y));
+          mask-repeat: no-repeat;
+        }
+        .top-left {
+          --_m:/calc(2*var(--r)) calc(2*var(--r)) radial-gradient(#000 70%,#0000 72%);
+          --_g:conic-gradient(at var(--r) var(--r),#000 75%,#0000 0);
+          --_d:(var(--s) + var(--r));
+          mask: calc(var(--_d) + var(--x)) 0 var(--_m), 0 calc(var(--_d) + var(--y)) var(--_m), radial-gradient(var(--s) at 0 0,#0000 99%,#000 calc(100% + 1px)) calc(var(--r) + var(--x)) calc(var(--r) + var(--y)), var(--_g) calc(var(--_d) + var(--x)) 0, var(--_g) 0 calc(var(--_d) + var(--y));
+          mask-repeat: no-repeat;
+        }
+        .bottom-left {
+          --_m:/calc(2*var(--r)) calc(2*var(--r)) radial-gradient(#000 70%,#0000 72%);
+          --_g:conic-gradient(from 180deg at var(--r) calc(100% - var(--r)),#0000 25%,#000 0);
+          --_d:(var(--s) + var(--r));
+          mask: calc(var(--_d) + var(--x)) 100% var(--_m), 0 calc(100% - var(--_d) - var(--y)) var(--_m), radial-gradient(var(--s) at 0 100%,#0000 99%,#000 calc(100% + 1px)) calc(var(--r) + var(--x)) calc(-1*var(--r) - var(--y)), var(--_g) calc(var(--_d) + var(--x)) 0, var(--_g) 0 calc(-1*var(--_d) - var(--y));
+          mask-repeat: no-repeat;
+        }
+        .bottom-right {
+          --_m:/calc(2*var(--r)) calc(2*var(--r)) radial-gradient(#000 70%,#0000 72%);
+          --_g:conic-gradient(from 90deg at calc(100% - var(--r)) calc(100% - var(--r)),#0000 25%,#000 0);
+          --_d:(var(--s) + var(--r));
+          mask: calc(100% - var(--_d) - var(--x)) 100% var(--_m), 100% calc(100% - var(--_d) - var(--y)) var(--_m), radial-gradient(var(--s) at 100% 100%,#0000 99%,#000 calc(100% + 1px)) calc(-1*var(--r) - var(--x)) calc(-1*var(--r) - var(--y)), var(--_g) calc(-1*var(--_d) - var(--x)) 0, var(--_g) 0 calc(-1*var(--_d) - var(--y));
+          mask-repeat: no-repeat;
+        }
+      `}</style>
+    </main>
+  );
+};
+
+
+demo.tsx
+import { DicedHeroSection } from "@/components/ui/diced-hero-section.tsx";
+
+// LTR Demo
+export function DemoLTR() {
+  return (
+    <DicedHeroSection
+      topText="Discover"
+      mainText="Freshness"
+      subMainText="Explore a vibrant harvest of organic, seasonal fruits and vegetables, bursting with flavors. Unveil a paramount selection of naturally delicious and nutritious premium produce sourced directly from local farms!"
+      buttonText="Shop Now"
+      slides={[
+        {
+          title: "Purple Cauliflower",
+          image: "https://images.unsplash.com/photo-1620053927547-cf64d4829ff4?q=80&w=1920&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        },
+        {
+          title: "Strawberry",
+          image: "https://images.unsplash.com/photo-1623227866882-c005c26dfe41?q=80&w=1920&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        },
+        {
+          title: "Feijoa",
+          image: "https://images.unsplash.com/photo-1541857754-557a44522bec?q=80&w=1920&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        },
+        {
+          title: "Fruits and Vegetables",
+          image: "https://images.unsplash.com/photo-1646340691161-521e588e9964?q=80&w=1920&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        },
+      ]}
+      onMainButtonClick={() => console.log("Main button clicked for LTR")}
+      onGridImageHover={index => console.log(`Grid image ${index} hovered for LTR`)}
+      onGridImageClick={index => console.log(`Grid image ${index} clicked for the LTR`)}
+      topTextStyle={{ color: "var(--diced-hero-section-top-text)" }}
+      mainTextStyle={{
+        fontSize: "4.5rem",
+        gradient: "linear-gradient(45deg, var(--diced-hero-section-main-gradient-from), var(--diced-hero-section-main-gradient-to))",
+      }}
+      subMainTextStyle={{ color: "var(--diced-hero-section-sub-text)" }}
+      buttonStyle={{
+        backgroundColor: "var(--diced-hero-section-button-bg)",
+        color: "var(--diced-hero-section-button-fg)",
+        borderRadius: "2rem",
+        hoverColor: "var(--diced-hero-section-button-hover-bg)",
+        hoverForeground: "var(--diced-hero-section-button-hover-fg)",
+      }}
+      separatorColor="var(--diced-hero-section-separator)"
+      mobileBreakpoint={1000}
+      fontFamily="Arial, sans-serif"
+    />
+  );
+}
+
+// RTL Demo
+export function DemoRTL() {
+  return (
+    <DicedHeroSection
+      topText="גלה"
+      mainText="טריות"
+      subMainText="חקור יבול עשיר של פירות וירקות אורגניים עונתיים, מלאי טעמים. גלה מבחר מעולה של תוצרת איכותית, טעימה וטבעית, מזינה ומגיעה ישירות מחוות מקומיות!"
+      buttonText="קנה עכשיו"
+      slides={[
+        {
+          title: "כרובית סגולה",
+          image: "https://images.unsplash.com/photo-1620053927547-cf64d4829ff4?q=80&w=1920&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        },
+        {
+          title: "תותים",
+          image: "https://images.unsplash.com/photo-1623227866882-c005c26dfe41?q=80&w=1920&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        },
+        {
+          title: "פיג'ויה",
+          image: "https://images.unsplash.com/photo-1541857754-557a44522bec?q=80&w=1920&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        },
+        {
+          title: "מגוון פירות וירקות",
+          image: "https://images.unsplash.com/photo-1646340691161-521e588e9964?q=80&w=1920&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        },
+      ]}
+      onMainButtonClick={() => console.log("Main button clicked for the RTL")}
+      onGridImageHover={index => console.log(`Grid image ${index} hovered for RTL`)}
+      onGridImageClick={index => console.log(`Grid image ${index} clicked for the RTL`)}
+      topTextStyle={{ color: "var(--diced-hero-section-top-text)" }}
+      mainTextStyle={{
+        fontSize: "5rem",
+        gradient: "linear-gradient(45deg, var(--diced-hero-section-main-gradient-from), var(--diced-hero-section-main-gradient-to))",
+      }}
+      subMainTextStyle={{ color: "var(--diced-hero-section-sub-text)" }}
+      buttonStyle={{
+        backgroundColor: "var(--diced-hero-section-button-bg)",
+        color: "var(--diced-hero-section-button-fg)",
+        borderRadius: "7px",
+        hoverColor: "var(--diced-hero-section-button-hover-bg)",
+        hoverForeground: "var(--diced-hero-section-button-hover-fg)",
+      }}
+      separatorColor="var(--diced-hero-section-separator)"
+      maxContentWidth="1190px"
+      mobileBreakpoint={910}
+      fontFamily="Arial, sans-serif"
+      isRTL={true}
+    />
+  );
+}
+
+```
+
+Copy-paste these files for dependencies:
+```tsx
+maxim.bort.devel/chronicle-button
+"use client";
+import React from "react";
+
+// Inline CSS as a string
+const styles = `
+.chronicleButton {
+  --chronicle-button-default-hover-color: var(--theme-color);
+  --chronicle-button-border-radius: var(--general-rounding, 8px);
+  border-radius: var(--chronicle-button-border-radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  line-height: 1;
+  padding: 1rem 1.232rem;
+  cursor: pointer;
+  border: none;
+  font-weight: 700;
+  background: var(--chronicle-button-background);
+  color: var(--chronicle-button-foreground);
+  transition: background 0.4s linear, color 0.4s linear;
+  will-change: background, color;
+  position: relative;
+}
+
+.chronicleButton:hover {
+  background: var(--chronicle-button-hover-background);
+  color: var(--chronicle-button-hover-foreground);
+}
+
+.chronicleButton span {
+  position: relative;
+  display: block;
+  perspective: 108px;
+}
+
+.chronicleButton span:nth-of-type(2) {
+  position: absolute;
+}
+
+.chronicleButton em {
+  font-style: normal;
+  display: inline-block;
+  font-size: 1.025rem;
+  color: inherit;
+  will-change: transform, opacity, color, transition;
+  transition: transform 0.55s cubic-bezier(.645,.045,.355,1), opacity 0.35s linear 0.2s, color 0.4s linear;
+}
+
+.chronicleButton span:nth-of-type(1) em {
+  transform-origin: top;
+}
+.chronicleButton span:nth-of-type(2) em {
+  opacity: 0;
+  transform: rotateX(-90deg) scaleX(.9) translate3d(0,10px,0);
+  transform-origin: bottom;
+}
+.chronicleButton:hover span:nth-of-type(1) em {
+  opacity: 0;
+  transform: rotateX(90deg) scaleX(.9) translate3d(0,-10px,0);
+}
+.chronicleButton:hover span:nth-of-type(2) em {
+  opacity: 1;
+  transform: rotateX(0deg) scaleX(1) translateZ(0);
+  transition: transform 0.75s cubic-bezier(.645,.045,.355,1), opacity 0.35s linear 0.3s, color 0.4s linear;
+}
+
+.chronicleButton.outlined {
+  background: transparent;
+  border: 2px solid var(--chronicle-button-background);
+  padding: calc(1rem - var(--outline-padding-adjustment)) 0;
+  color: var(--chronicle-button-background);
+  transition: border 0.4s linear, color 0.4s linear, background-color 0.4s linear;
+  will-change: border, color;
+}
+
+.chronicleButton.outlined:hover {
+  background: var(--outlined-button-background-on-hover, transparent);
+  border-color: var(--chronicle-button-hover-background);
+  color: var(--chronicle-button-hover-background);
+}
+
+.chronicleButton.outlined span:nth-of-type(1) em,
+.chronicleButton.outlined span:nth-of-type(2) em {
+  transition: color 0.4s linear;
+}
+
+.chronicleButton.outlined:hover span:nth-of-type(1) em,
+.chronicleButton.outlined:hover span:nth-of-type(2) em {
+  color: var(--chronicle-button-hover-background);
+}
+`;
+
+interface ChronicleButtonProps {
+  text: string;
+  onClick?: () => void;
+  hoverColor?: string;
+  width?: string;
+  outlined?: boolean;
+  outlinePaddingAdjustment?: string;
+  borderRadius?: string;
+  outlinedButtonBackgroundOnHover?: string;
+  customBackground?: string;
+  customForeground?: string;
+  hoverForeground?: string;
+}
+
+export const ChronicleButton: React.FC<ChronicleButtonProps> = ({
+  text,
+  onClick,
+  hoverColor = "#a594fd",
+  width = "160px",
+  outlined = false,
+  outlinePaddingAdjustment = "2px",
+  borderRadius = "8px",
+  outlinedButtonBackgroundOnHover = "transparent",
+  customBackground = "#fff",
+  customForeground = "#111014",
+  hoverForeground = "#111014",
+}) => {
+  // Inject styles once
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!document.getElementById("chronicle-button-style")) {
+      const style = document.createElement("style");
+      style.id = "chronicle-button-style";
+      style.innerHTML = styles;
+      document.head.appendChild(style);
+    }
+  }, []);
+
+  const buttonStyle = {
+    "--chronicle-button-background": customBackground,
+    "--chronicle-button-foreground": customForeground,
+    "--chronicle-button-hover-background": hoverColor,
+    "--chronicle-button-hover-foreground": hoverForeground,
+    "--outline-padding-adjustment": outlinePaddingAdjustment,
+    "--chronicle-button-border-radius": borderRadius,
+    "--outlined-button-background-on-hover": outlinedButtonBackgroundOnHover,
+    width: width,
+    borderRadius: borderRadius,
+  } as React.CSSProperties;
+
+  return (
+    <button
+      className={`chronicleButton${outlined ? " outlined" : ""}`}
+      onClick={onClick}
+      style={buttonStyle}
+      type="button"
+    >
+      <span>
+        <em>{text}</em>
+      </span>
+      <span>
+        <em>{text}</em>
+      </span>
+    </button>
+  );
+};
+
+```
+
+Install NPM dependencies:
+```bash
+framer-motion
+```
+
+Extend existing Tailwind 4 index.css with this code (or if project uses Tailwind 3, extend tailwind.config.js or globals.css):
+```css
+@import "tailwindcss";
+@import "tw-animate-css";
+
+:root {
+  --diced-hero-section-top-text: #2c3e50;
+  --diced-hero-section-main-gradient-from: #16a085;
+  --diced-hero-section-main-gradient-to: #2980b9;
+  --diced-hero-section-main-gradient-foreground: #16a085;
+  --diced-hero-section-separator: #005baa;
+  --diced-hero-section-sub-text: #34495e;
+  --diced-hero-section-button-bg: #27ae60;
+  --diced-hero-section-button-fg: #ffffff;
+  --diced-hero-section-button-hover-bg: #2ecc71;
+  --diced-hero-section-button-hover-fg: #fff;
+}
+
+.dark {
+  --diced-hero-section-top-text: #f7f7ff;
+  --diced-hero-section-main-gradient-from: #9F4EFF;
+  --diced-hero-section-main-gradient-to: #00A6FB;
+  --diced-hero-section-main-gradient-foreground: #9F4EFF;
+  --diced-hero-section-separator: #086CA2;
+  --diced-hero-section-sub-text: #f7f7ff;
+  --diced-hero-section-button-bg: #00A6FB;
+  --diced-hero-section-button-fg: #0A0A0A;
+  --diced-hero-section-button-hover-bg: #9F4EFF;
+  --diced-hero-section-button-hover-fg: #FFFFFF;
+}
+
+```
+
+
+You are given a task to integrate an existing React component in the codebase
+
+The codebase should support:
+- shadcn project structure  
+- Tailwind CSS
+- Typescript
+
+If it doesn't, provide instructions on how to setup project via shadcn CLI, install Tailwind or Typescript.
+
+Determine the default path for components and styles. 
+If default path for components is not /components/ui, provide instructions on why it's important to create this folder
+Copy-paste this component to /components/ui folder:
+```tsx
+call-to-action-1.tsx
+import { cn } from "@/lib/utils";
+import { useState } from "react";
+export default function Example() {
+    return (
+        <>
+            <style>{`
+                @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+            
+                * {
+                    font-family: 'Poppins', sans-serif;
+                }
+            `}</style>
+            
+            <div className="max-w-5xl py-16 md:w-full mx-2 md:mx-auto flex flex-col items-center justify-center text-center bg-gradient-to-b from-[#5524B7] to-[#380B60] rounded-2xl p-10 text-white">
+                <div className="flex flex-wrap items-center justify-center p-1 rounded-full bg-purple-600/10 backdrop-blur border border-purple-500/40 text-sm">
+                    <div className="flex items-center">
+                        <img className="size-6 md:size-7 rounded-full border-3 border-white"
+                            src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&w=50" alt="userImage1" />
+                        <img className="size-6 md:size-7 rounded-full border-3 border-white -translate-x-2"
+                            src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=50" alt="userImage2" />
+                        <img className="size-6 md:size-7 rounded-full border-3 border-white -translate-x-4"
+                            src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=50&h=50&auto=format&fit=crop"
+                            alt="userImage3" />
+                    </div>
+                    <p className="-translate-x-2 font-medium">Join community of 1m+ founders </p>
+                </div>
+                <h1 className="text-4xl md:text-5xl md:leading-[60px] font-semibold max-w-xl mt-5 bg-gradient-to-r from-white to-[#CAABFF] text-transparent bg-clip-text">Unlock your next big opportunity.</h1>
+                <button className="px-8 py-3 text-white bg-violet-600 hover:bg-violet-700 transition-all rounded-full uppercase text-sm mt-8">
+                    Join Discord
+                </button>
+            </div>
+        </>
+    );
+};
+
+demo.tsx
+import Example from "@/components/ui/call-to-action-1";
+
+export default function DemoOne() {
+  return <Example />;
+}
+
+```
+
+
+You are given a task to integrate an existing React component in the codebase
+
+The codebase should support:
+- shadcn project structure  
+- Tailwind CSS
+- Typescript
+
+If it doesn't, provide instructions on how to setup project via shadcn CLI, install Tailwind or Typescript.
+
+Determine the default path for components and styles. 
+If default path for components is not /components/ui, provide instructions on why it's important to create this folder
+Copy-paste this component to /components/ui folder:
+```tsx
+retro-testimonial.tsx
+"use client";
+
+import React, {useEffect, useRef, useState} from "react";
+
+import Image from "next/image";
+import {AnimatePresence, motion} from "framer-motion";
+import {ImageProps} from "next/image";
+import {ArrowLeft, ArrowRight, Quote, X} from "lucide-react";
+
+import {cn} from "@/lib/utils";
+
+// ===== Types and Interfaces =====
+export interface iTestimonial {
+	name: string;
+	designation: string;
+	description: string;
+	profileImage: string;
+}
+
+interface iCarouselProps {
+	items: React.ReactElement<{
+		testimonial: iTestimonial;
+		index: number;
+		layout?: boolean;
+		onCardClose: () => void;
+	}>[];
+	initialScroll?: number;
+}
+
+// ===== Custom Hooks =====
+const useOutsideClick = (
+	ref: React.RefObject<HTMLDivElement | null>,
+	onOutsideClick: () => void,
+) => {
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+			if (!ref.current || ref.current.contains(event.target as Node)) {
+				return;
+			}
+			onOutsideClick();
+		};
+
+		document.addEventListener("mousedown", handleClickOutside);
+		document.addEventListener("touchstart", handleClickOutside);
+
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+			document.removeEventListener("touchstart", handleClickOutside);
+		};
+	}, [ref, onOutsideClick]);
+};
+
+// ===== Components =====
+const Carousel = ({items, initialScroll = 0}: iCarouselProps) => {
+	const carouselRef = React.useRef<HTMLDivElement>(null);
+	const [canScrollLeft, setCanScrollLeft] = React.useState(false);
+	const [canScrollRight, setCanScrollRight] = React.useState(true);
+
+	const checkScrollability = () => {
+		if (carouselRef.current) {
+			const {scrollLeft, scrollWidth, clientWidth} = carouselRef.current;
+			setCanScrollLeft(scrollLeft > 0);
+			setCanScrollRight(scrollLeft < scrollWidth - clientWidth);
+		}
+	};
+
+	const handleScrollLeft = () => {
+		if (carouselRef.current) {
+			carouselRef.current.scrollBy({left: -300, behavior: "smooth"});
+		}
+	};
+
+	const handleScrollRight = () => {
+		if (carouselRef.current) {
+			carouselRef.current.scrollBy({left: 300, behavior: "smooth"});
+		}
+	};
+
+	const handleCardClose = (index: number) => {
+		if (carouselRef.current) {
+			const cardWidth = isMobile() ? 230 : 384;
+			const gap = isMobile() ? 4 : 8;
+			const scrollPosition = (cardWidth + gap) * (index + 1);
+			carouselRef.current.scrollTo({
+				left: scrollPosition,
+				behavior: "smooth",
+			});
+		}
+	};
+
+	const isMobile = () => {
+		return window && window.innerWidth < 768;
+	};
+
+	useEffect(() => {
+		if (carouselRef.current) {
+			carouselRef.current.scrollLeft = initialScroll;
+			checkScrollability();
+		}
+	}, [initialScroll]);
+
+	return (
+		<div className="relative w-full mt-10">
+			<div
+				className="flex w-full overflow-x-scroll overscroll-x-auto scroll-smooth [scrollbar-width:none] py-5"
+				ref={carouselRef}
+				onScroll={checkScrollability}
+			>
+				<div
+					className={cn(
+						"absolute right-0 z-[1000] h-auto w-[5%] overflow-hidden bg-gradient-to-l",
+					)}
+				/>
+				<div
+					className={cn(
+						"flex flex-row justify-start gap-4 pl-3",
+						"max-w-5xl mx-auto",
+					)}
+				>
+					{items.map((item, index) => {
+						return (
+							<motion.div
+								initial={{opacity: 0, y: 20}}
+								animate={{
+									opacity: 1,
+									y: 0,
+									transition: {
+										duration: 0.5,
+										delay: 0.2 * index,
+										ease: "easeOut",
+										once: true,
+									},
+								}}
+								key={`card-${index}`}
+								className="last:pr-[5%] md:last:pr-[33%] rounded-3xl"
+							>
+								{React.cloneElement(item, {
+									onCardClose: () => {
+										return handleCardClose(index);
+									},
+								})}
+							</motion.div>
+						);
+					})}
+				</div>
+			</div>
+			<div className="flex justify-end gap-2 mt-4">
+				<button
+					className="relative z-40 h-10 w-10 rounded-full bg-[#4b3f33] flex items-center justify-center disabled:opacity-50 hover:bg-[#4b3f33]/80 transition-colors duration-200"
+					onClick={handleScrollLeft}
+					disabled={!canScrollLeft}
+				>
+					<ArrowLeft className="h-6 w-6 text-[#f2f0eb]" />
+				</button>
+				<button
+					className="relative z-40 h-10 w-10 rounded-full bg-[#4b3f33] flex items-center justify-center disabled:opacity-50 hover:bg-[#4b3f33]/80 transition-colors duration-200"
+					onClick={handleScrollRight}
+					disabled={!canScrollRight}
+				>
+					<ArrowRight className="h-6 w-6 text-[#f2f0eb]" />
+				</button>
+			</div>
+		</div>
+	);
+};
+
+const TestimonialCard = ({
+	testimonial,
+	index,
+	layout = false,
+	onCardClose = () => {},
+	backgroundImage = "https://images.unsplash.com/photo-1686806372726-388d03ff49c8?q=80&w=3087&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+}: {
+	testimonial: iTestimonial;
+	index: number;
+	layout?: boolean;
+	onCardClose?: () => void;
+	backgroundImage?: string;
+}) => {
+	const [isExpanded, setIsExpanded] = useState(false);
+	const containerRef = useRef<HTMLDivElement>(null);
+
+	const handleExpand = () => {
+		return setIsExpanded(true);
+	};
+	const handleCollapse = () => {
+		setIsExpanded(false);
+		onCardClose();
+	};
+
+	useEffect(() => {
+		const handleEscapeKey = (event: KeyboardEvent) => {
+			if (event.key === "Escape") {
+				handleCollapse();
+			}
+		};
+
+		if (isExpanded) {
+			const scrollY = window.scrollY;
+			document.body.style.position = "fixed";
+			document.body.style.top = `-${scrollY}px`;
+			document.body.style.width = "100%";
+			document.body.style.overflow = "hidden";
+			document.body.dataset.scrollY = scrollY.toString();
+		} else {
+			const scrollY = parseInt(document.body.dataset.scrollY || "0", 10);
+			document.body.style.position = "";
+			document.body.style.top = "";
+			document.body.style.width = "";
+			document.body.style.overflow = "";
+			window.scrollTo({top: scrollY, behavior: "instant"});
+		}
+
+		window.addEventListener("keydown", handleEscapeKey);
+		return () => {
+			return window.removeEventListener("keydown", handleEscapeKey);
+		};
+	}, [isExpanded]);
+
+	useOutsideClick(containerRef, handleCollapse);
+
+	return (
+		<>
+			<AnimatePresence>
+				{isExpanded && (
+					<div className="fixed inset-0 h-screen overflow-hidden z-50">
+						<motion.div
+							initial={{opacity: 0}}
+							animate={{opacity: 1}}
+							exit={{opacity: 0}}
+							className="bg-red backdrop-blur-lg h-full w-full fixed inset-0"
+						/>
+						<motion.div
+							initial={{opacity: 0}}
+							animate={{opacity: 1}}
+							exit={{opacity: 0}}
+							ref={containerRef}
+							layoutId={layout ? `card-${testimonial.name}` : undefined}
+							className="max-w-5xl mx-auto bg-gradient-to-b from-[#f2f0eb] to-[#fff9eb] h-full z-[60] p-4 md:p-10 rounded-3xl relative md:mt-10"
+						>
+							<button
+								className="sticky top-4 h-8 w-8 right-0 ml-auto rounded-full flex items-center justify-center bg-[#4b3f33]"
+								onClick={handleCollapse}
+							>
+								<X className="h-6 w-6 text-white dark:text-neutral-900 absolute" />
+							</button>
+							<motion.p
+								layoutId={layout ? `category-${testimonial.name}` : undefined}
+								className="px-0 md:px-20 text-[rgba(31, 27, 29, 0.7)] text-lg dark:text-white font-thin font-tiemposHeadline underline underline-offset-8"
+							>
+								{testimonial.designation}
+							</motion.p>
+							<motion.p
+								layoutId={layout ? `title-${testimonial.name}` : undefined}
+								className="px-0 md:px-20 text-2xl md:text-4xl font-normal italic text-[rgba(31, 27, 29, 0.7)] mt-4 dark:text-white font-tiemposHeadline lowercase"
+							>
+								{testimonial.name}
+							</motion.p>
+							<div className="py-8 text-[rgba(31, 27, 29, 0.7)] px-0 md:px-20 text-3xl lowercase font-thin font-tiemposHeadline leading-snug tracking-wide">
+								<Quote className="h-6 w-6 text-[rgba(31, 27, 29, 0.7)] dark:text-neutral-900" />
+								{testimonial.description}
+							</div>
+						</motion.div>
+					</div>
+				)}
+			</AnimatePresence>
+			<motion.button
+				layoutId={layout ? `card-${testimonial.name}` : undefined}
+				onClick={handleExpand}
+				className=""
+				whileHover={{
+					rotateX: 2,
+					rotateY: 2,
+					rotate: 3,
+					scale: 1.02,
+					transition: {duration: 0.3, ease: "easeOut"},
+				}}
+			>
+				<div
+					className={`${index % 2 === 0 ? "rotate-0" : "-rotate-0"} rounded-3xl bg-gradient-to-b from-[#f2f0eb] to-[#fff9eb] h-[500px] md:h-[550px] w-80 md:w-96 overflow-hidden flex flex-col items-center justify-center relative z-10 shadow-md`}
+				>
+					<div className="absolute opacity-30" style={{inset: "-1px 0 0"}}>
+						<div className="absolute inset-0">
+							<Image
+								className="block w-full h-full object-center object-cover"
+								src={backgroundImage}
+								alt="Background layer"
+								layout="fill"
+								objectFit="cover"
+							/>
+						</div>
+					</div>
+					<ProfileImage src={testimonial.profileImage} alt={testimonial.name} />
+					<motion.p
+						layoutId={layout ? `title-${testimonial.name}` : undefined}
+						className="text-[rgba(31, 27, 29, 0.7)] text-2xl md:text-2xl font-normal text-center [text-wrap:balance] font-tiemposHeadline mt-4 lowercase px-3"
+					>
+						{testimonial.description.length > 100
+							? `${testimonial.description.slice(0, 100)}...`
+							: testimonial.description}
+					</motion.p>
+					<motion.p
+						layoutId={layout ? `category-${testimonial.name}` : undefined}
+						className="text-[rgba(31, 27, 29, 0.7)] text-xl md:text-2xl font-thin font-tiemposHeadline italic text-center mt-5 lowercase"
+					>
+						{testimonial.name}.
+					</motion.p>
+					<motion.p
+						layoutId={layout ? `category-${testimonial.name}` : undefined}
+						className="text-[rgba(31, 27, 29, 0.7)] text-base md:text-base font-thin font-tiemposHeadline italic text-center mt-1 lowercase underline underline-offset-8 decoration-1"
+					>
+						{testimonial.designation.length > 25
+							? `${testimonial.designation.slice(0, 25)}...`
+							: testimonial.designation}
+					</motion.p>
+				</div>
+			</motion.button>
+		</>
+	);
+};
+
+const ProfileImage = ({src, alt, ...rest}: ImageProps) => {
+	const [isLoading, setLoading] = useState(true);
+
+	return (
+		<div className="w-[90px] h-[90px] md:w-[150px] md:h-[150px] opacity-80 overflow-hidden rounded-[1000px] border-[3px] border-solid border-[rgba(59,59,59,0.6)] aspect-[1/1] flex-none saturate-[0.2] sepia-[0.46] relative">
+			<Image
+				className={cn(
+					"transition duration-300 absolute top-0 inset-0 rounded-inherit object-cover z-50",
+					isLoading ? "blur-sm" : "blur-0",
+				)}
+				onLoad={() => {
+					return setLoading(false);
+				}}
+				src={src}
+				width={150}
+				height={150}
+				loading="lazy"
+				decoding="async"
+				blurDataURL={typeof src === "string" ? src : undefined}
+				alt={alt || "Profile image"}
+				{...rest}
+			/>
+		</div>
+	);
+};
+
+// Export the components
+export {Carousel, TestimonialCard, ProfileImage};
+
+
+demo.tsx
+import {Carousel, TestimonialCard} from "@/components/ui/retro-testimonial";
+import {iTestimonial} from "@/components/ui/retro-testimonial";
+type TestimonialDetails = {
+	[key: string]: iTestimonial & {id: string};
+};
+
+const testimonialData = {
+	ids: [
+		"e60aa346-f6da-11ed-b67e-0242ac120002",
+		"e60aa346-f6da-11ed-b67e-0242ac120003",
+		"e60aa346-f6da-11ed-b67e-0242ac120004",
+		"e60aa346-f6da-11ed-b67e-0242ac120005",
+		"e60aa346-f6da-11ed-b67e-0242ac120006",
+		"e60aa346-f6da-11ed-b67e-0242ac120007",
+	],
+	details: {
+		"e60aa346-f6da-11ed-b67e-0242ac120002": {
+			id: "e60aa346-f6da-11ed-b67e-0242ac120002",
+			description:
+				"The component library has revolutionized our development workflow. The pre-built components are not only beautiful but also highly customizable. It's saved us countless hours of development time.",
+			profileImage:
+				"https://images.unsplash.com/photo-1506794778202-cad84cf45f1d",
+			name: "Sarah Chen",
+			designation: "Senior Frontend Developer",
+		},
+		"e60aa346-f6da-11ed-b67e-0242ac120003": {
+			id: "e60aa346-f6da-11ed-b67e-0242ac120003",
+			description:
+				"As a startup founder, I needed a quick way to build a professional-looking product. This component library was exactly what I needed. The documentation is clear, and the components are production-ready.",
+			profileImage:
+				"https://images.unsplash.com/photo-1506794778202-cad84cf45f1d",
+			name: "Michael Rodriguez",
+			designation: "Founder, TechStart",
+		},
+		"e60aa346-f6da-11ed-b67e-0242ac120004": {
+			id: "e60aa346-f6da-11ed-b67e-0242ac120004",
+			description:
+				"The attention to detail in these components is impressive. From accessibility features to responsive design, everything is well thought out. It's become an essential part of our tech stack.",
+			profileImage:
+				"https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
+			name: "David Kim",
+			designation: "UI/UX Lead",
+		},
+		"e60aa346-f6da-11ed-b67e-0242ac120005": {
+			id: "e60aa346-f6da-11ed-b67e-0242ac120005",
+			description:
+				"What sets this component library apart is its flexibility. We've been able to maintain consistency across our applications while still customizing components to match our brand identity perfectly.",
+			profileImage:
+				"https://images.unsplash.com/photo-1494790108377-be9c29b29330",
+			name: "Emily Thompson",
+			designation: "Product Designer",
+		},
+		"e60aa346-f6da-11ed-b67e-0242ac120006": {
+			id: "e60aa346-f6da-11ed-b67e-0242ac120006",
+			description:
+				"The performance optimization in these components is outstanding. We've seen significant improvements in our application's load times and overall user experience since implementing them.",
+			profileImage:
+				"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+			name: "James Wilson",
+			designation: "Performance Engineer",
+		},
+		"e60aa346-f6da-11ed-b67e-0242ac120007": {
+			id: "e60aa346-f6da-11ed-b67e-0242ac120007",
+			description:
+				"The community support and regular updates make this component library a reliable choice for our projects. It's clear that the team behind it is committed to maintaining high quality and adding new features.",
+			profileImage:
+				"https://images.unsplash.com/photo-1534528741775-53994a69daeb",
+			name: "Sophia Martinez",
+			designation: "Full Stack Developer",
+		},
+	},
+};
+
+// Example 1: Basic Carousel with Testimonials
+const cards = testimonialData.ids.map((cardId: string, index: number) => {
+	const details = testimonialData.details as TestimonialDetails;
+	return (
+		<TestimonialCard
+			key={cardId}
+			testimonial={details[cardId]}
+			index={index}
+			backgroundImage="https://images.unsplash.com/photo-1528458965990-428de4b1cb0d?q=80&w=3129&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+		/>
+	);
+});
+
+const DemoOne = () => {
+  return (
+    <div className="min-h-screen">
+			{/* Example 1: Basic Carousel */}
+			<section className="py-12 bg-white">
+				<div className="max-w-5xl mx-auto px-4">
+					<Carousel items={cards} />
+				</div>
+			</section>
+
+			{/* Example 2: Vintage Style */}
+		</div>
+  );
+};
+
+
+export { DemoOne };
+
+```
+
+Install NPM dependencies:
+```bash
+next, lucide-react, framer-motion
+```
+
+
+You are given a task to integrate an existing React component in the codebase
+
+The codebase should support:
+- shadcn project structure  
+- Tailwind CSS
+- Typescript
+
+If it doesn't, provide instructions on how to setup project via shadcn CLI, install Tailwind or Typescript.
+
+Determine the default path for components and styles. 
+If default path for components is not /components/ui, provide instructions on why it's important to create this folder
+Copy-paste this component to /components/ui folder:
+```tsx
+testimonials-columns-1.tsx
+"use client";
+import React from "react";
+import { motion } from "motion/react";
+
+
+export const TestimonialsColumn = (props: {
+  className?: string;
+  testimonials: typeof testimonials;
+  duration?: number;
+}) => {
+  return (
+    <div className={props.className}>
+      <motion.div
+        animate={{
+          translateY: "-50%",
+        }}
+        transition={{
+          duration: props.duration || 10,
+          repeat: Infinity,
+          ease: "linear",
+          repeatType: "loop",
+        }}
+        className="flex flex-col gap-6 pb-6 bg-background"
+      >
+        {[
+          ...new Array(2).fill(0).map((_, index) => (
+            <React.Fragment key={index}>
+              {props.testimonials.map(({ text, image, name, role }, i) => (
+                <div className="p-10 rounded-3xl border shadow-lg shadow-primary/10 max-w-xs w-full" key={i}>
+                  <div>{text}</div>
+                  <div className="flex items-center gap-2 mt-5">
+                    <img
+                      width={40}
+                      height={40}
+                      src={image}
+                      alt={name}
+                      className="h-10 w-10 rounded-full"
+                    />
+                    <div className="flex flex-col">
+                      <div className="font-medium tracking-tight leading-5">{name}</div>
+                      <div className="leading-5 opacity-60 tracking-tight">{role}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </React.Fragment>
+          )),
+        ]}
+      </motion.div>
+    </div>
+  );
+};
+
+;
+
+demo.tsx
+import { TestimonialsColumn } from "@/components/ui/testimonials-columns-1";
+import { motion } from "motion/react";
+
+const testimonials = [
+  {
+    text: "This ERP revolutionized our operations, streamlining finance and inventory. The cloud-based platform keeps us productive, even remotely.",
+    image: "https://randomuser.me/api/portraits/women/1.jpg",
+    name: "Briana Patton",
+    role: "Operations Manager",
+  },
+  {
+    text: "Implementing this ERP was smooth and quick. The customizable, user-friendly interface made team training effortless.",
+    image: "https://randomuser.me/api/portraits/men/2.jpg",
+    name: "Bilal Ahmed",
+    role: "IT Manager",
+  },
+  {
+    text: "The support team is exceptional, guiding us through setup and providing ongoing assistance, ensuring our satisfaction.",
+    image: "https://randomuser.me/api/portraits/women/3.jpg",
+    name: "Saman Malik",
+    role: "Customer Support Lead",
+  },
+  {
+    text: "This ERP's seamless integration enhanced our business operations and efficiency. Highly recommend for its intuitive interface.",
+    image: "https://randomuser.me/api/portraits/men/4.jpg",
+    name: "Omar Raza",
+    role: "CEO",
+  },
+  {
+    text: "Its robust features and quick support have transformed our workflow, making us significantly more efficient.",
+    image: "https://randomuser.me/api/portraits/women/5.jpg",
+    name: "Zainab Hussain",
+    role: "Project Manager",
+  },
+  {
+    text: "The smooth implementation exceeded expectations. It streamlined processes, improving overall business performance.",
+    image: "https://randomuser.me/api/portraits/women/6.jpg",
+    name: "Aliza Khan",
+    role: "Business Analyst",
+  },
+  {
+    text: "Our business functions improved with a user-friendly design and positive customer feedback.",
+    image: "https://randomuser.me/api/portraits/men/7.jpg",
+    name: "Farhan Siddiqui",
+    role: "Marketing Director",
+  },
+  {
+    text: "They delivered a solution that exceeded expectations, understanding our needs and enhancing our operations.",
+    image: "https://randomuser.me/api/portraits/women/8.jpg",
+    name: "Sana Sheikh",
+    role: "Sales Manager",
+  },
+  {
+    text: "Using this ERP, our online presence and conversions significantly improved, boosting business performance.",
+    image: "https://randomuser.me/api/portraits/men/9.jpg",
+    name: "Hassan Ali",
+    role: "E-commerce Manager",
+  },
+];
+
+
+const firstColumn = testimonials.slice(0, 3);
+const secondColumn = testimonials.slice(3, 6);
+const thirdColumn = testimonials.slice(6, 9);
+
+
+const Testimonials = () => {
+  return (
+    <section className="bg-background my-20 relative">
+
+      <div className="container z-10 mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          viewport={{ once: true }}
+          className="flex flex-col items-center justify-center max-w-[540px] mx-auto"
+        >
+          <div className="flex justify-center">
+            <div className="border py-1 px-4 rounded-lg">Testimonials</div>
+          </div>
+
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tighter mt-5">
+            What our users say
+          </h2>
+          <p className="text-center mt-5 opacity-75">
+            See what our customers have to say about us.
+          </p>
+        </motion.div>
+
+        <div className="flex justify-center gap-6 mt-10 [mask-image:linear-gradient(to_bottom,transparent,black_25%,black_75%,transparent)] max-h-[740px] overflow-hidden">
+          <TestimonialsColumn testimonials={firstColumn} duration={15} />
+          <TestimonialsColumn testimonials={secondColumn} className="hidden md:block" duration={19} />
+          <TestimonialsColumn testimonials={thirdColumn} className="hidden lg:block" duration={17} />
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default { Testimonials };
+```
+
+Install NPM dependencies:
+```bash
+motion
+```
+
+
+You are given a task to integrate an existing React component in the codebase
+
+The codebase should support:
+- shadcn project structure  
+- Tailwind CSS
+- Typescript
+
+If it doesn't, provide instructions on how to setup project via shadcn CLI, install Tailwind or Typescript.
+
+Determine the default path for components and styles. 
+If default path for components is not /components/ui, provide instructions on why it's important to create this folder
+Copy-paste this component to /components/ui folder:
+```tsx
+shuffle-grid.tsx
+"use client"
+
+import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
+
+export const ShuffleHero = () => {
+  return (
+    <section className="w-full px-8 py-12 grid grid-cols-1 md:grid-cols-2 items-center gap-8 max-w-6xl mx-auto">
+      <div>
+        <span className="block mb-4 text-xs md:text-sm text-primary font-medium">
+          Better every day
+        </span>
+        <h3 className="text-4xl md:text-6xl font-semibold text-foreground">
+          Let's change it up a bit
+        </h3>
+        <p className="text-base md:text-lg text-muted-foreground my-4 md:my-6">
+          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nam nobis in
+          error repellat voluptatibus ad.
+        </p>
+        <button className={cn(
+          "bg-primary text-primary-foreground font-medium py-2 px-4 rounded-md",
+          "transition-all hover:bg-primary/90 active:scale-95",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        )}>
+          Find a class
+        </button>
+      </div>
+      <ShuffleGrid />
+    </section>
+  );
+};
+
+const shuffle = (array: (typeof squareData)[0][]) => {
+  let currentIndex = array.length,
+    randomIndex;
+
+  while (currentIndex != 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex],
+      array[currentIndex],
+    ];
+  }
+
+  return array;
+};
+
+const squareData = [
+  {
+    id: 1,
+    src: "https://images.unsplash.com/photo-1547347298-4074fc3086f0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
+  },
+  {
+    id: 2,
+    src: "https://images.unsplash.com/photo-1510925758641-869d353cecc7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80",
+  },
+  {
+    id: 3,
+    src: "https://images.unsplash.com/photo-1629901925121-8a141c2a42f4?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80",
+  },
+  {
+    id: 4,
+    src: "https://images.unsplash.com/photo-1580238053495-b9720401fd45?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80",
+  },
+  {
+    id: 5,
+    src: "https://images.unsplash.com/photo-1569074187119-c87815b476da?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1325&q=80",
+  },
+  {
+    id: 6,
+    src: "https://images.unsplash.com/photo-1556817411-31ae72fa3ea0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
+  },
+  {
+    id: 7,
+    src: "https://images.unsplash.com/photo-1599586120429-48281b6f0ece?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
+  },
+  {
+    id: 8,
+    src: "https://plus.unsplash.com/premium_photo-1671436824833-91c0741e89c9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
+  },
+  {
+    id: 9,
+    src: "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
+  },
+  {
+    id: 10,
+    src: "https://images.unsplash.com/photo-1610768764270-790fbec18178?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80",
+  },
+  {
+    id: 11,
+    src: "https://images.unsplash.com/photo-1507034589631-9433cc6bc453?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=684&q=80",
+  },
+  {
+    id: 12,
+    src: "https://images.unsplash.com/photo-1533107862482-0e6974b06ec4?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=882&q=80",
+  },
+  {
+    id: 13,
+    src: "https://images.unsplash.com/photo-1560089000-7433a4ebbd64?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80",
+  },
+  {
+    id: 14,
+    src: "https://images.unsplash.com/photo-1517466787929-bc90951d0974?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=686&q=80",
+  },
+  {
+    id: 15,
+    src: "https://images.unsplash.com/photo-1606244864456-8bee63fce472?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=681&q=80",
+  },
+  {
+    id: 16,
+    src: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1820&q=80",
+  },
+];
+
+const generateSquares = () => {
+  return shuffle(squareData).map((sq) => (
+    <motion.div
+      key={sq.id}
+      layout
+      transition={{ duration: 1.5, type: "spring" }}
+      className="w-full h-full rounded-md overflow-hidden bg-muted"
+      style={{
+        backgroundImage: `url(${sq.src})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    ></motion.div>
+  ));
+};
+
+const ShuffleGrid = () => {
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [squares, setSquares] = useState(generateSquares());
+
+  useEffect(() => {
+    shuffleSquares();
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
+  const shuffleSquares = () => {
+    setSquares(generateSquares());
+
+    timeoutRef.current = setTimeout(shuffleSquares, 3000);
+  };
+
+  return (
+    <div className="grid grid-cols-4 grid-rows-4 h-[450px] gap-1">
+      {squares.map((sq) => sq)}
+    </div>
+  );
+};
+
+
+demo.tsx
+import { ShuffleHero } from "@/components/ui/shuffle-grid";
+
+const ShuffleHeroDemo = () => {
+  return (
+    <div className="flex w-full h-screen justify-center items-center">
+      <ShuffleHero />
+    </div>
+  );
+};
+
+export { ShuffleHeroDemo };
+
+```
+
+Install NPM dependencies:
+```bash
+framer-motion
+```
+
+
+You are given a task to integrate an existing React component in the codebase
+
+The codebase should support:
+- shadcn project structure  
+- Tailwind CSS
+- Typescript
+
+If it doesn't, provide instructions on how to setup project via shadcn CLI, install Tailwind or Typescript.
+
+Determine the default path for components and styles. 
+If default path for components is not /components/ui, provide instructions on why it's important to create this folder
+Copy-paste this component to /components/ui folder:
+```tsx
+email-client-card.tsx
+import * as React from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { AnimatePresence, motion } from 'framer-motion';
+import { cn } from '@/lib/utils'; // Assuming you have a utils file for `cn`
+
+// ShadCN UI Primitives (install via CLI)
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+
+const cardVariants = cva(
+  'w-full max-w-2xl mx-auto rounded-xl border bg-card text-card-foreground shadow-sm flex flex-col transition-colors',
+  {
+    variants: {
+      isExpanded: {
+        true: 'h-auto',
+        false: 'h-auto', // Placeholder for potential collapsed styles
+      },
+    },
+    defaultVariants: {
+      isExpanded: true,
+    },
+  },
+);
+
+export interface EmailClientCardProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof cardVariants> {
+  avatarSrc: string;
+  avatarFallback: string;
+  senderName: string;
+  senderEmail: string;
+  timestamp: string;
+  message: string;
+  actions?: React.ReactNode[];
+  reactions?: string[];
+  onReactionClick?: (reaction: string) => void;
+  onActionClick?: (index: number) => void;
+}
+
+const EmailClientCard = React.forwardRef<HTMLDivElement, EmailClientCardProps>(
+  (
+    {
+      className,
+      avatarSrc,
+      avatarFallback,
+      senderName,
+      senderEmail,
+      timestamp,
+      message,
+      actions = [],
+      reactions = [],
+      onReactionClick,
+      onActionClick,
+      isExpanded,
+      ...props
+    },
+    ref,
+  ) => {
+    const [inputValue, setInputValue] = React.useState('');
+
+    const containerVariants = {
+      hidden: { opacity: 0, y: 20 },
+      visible: {
+        opacity: 1,
+        y: 0,
+        transition: {
+          staggerChildren: 0.05,
+        },
+      },
+    };
+
+    const itemVariants = {
+      hidden: { opacity: 0, y: 10 },
+      visible: { opacity: 1, y: 0 },
+    };
+
+    return (
+      <motion.div
+        ref={ref}
+        className={cn(cardVariants({ isExpanded }), className)}
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        {...props}
+      >
+        {/* Card Header */}
+        <motion.div
+          className="p-4 sm:p-6 flex items-start gap-4 border-b"
+          variants={itemVariants}
+        >
+          <Avatar className="w-10 h-10 border">
+            <AvatarImage src={avatarSrc} alt={senderName} />
+            <AvatarFallback>{avatarFallback}</AvatarFallback>
+          </Avatar>
+          <div className="flex-grow">
+            <p className="font-semibold text-card-foreground">{senderName}</p>
+            <p className="text-sm text-muted-foreground">{senderEmail}</p>
+          </div>
+          <div className="flex items-center gap-1 text-muted-foreground">
+            <span className="text-xs hidden sm:inline">{timestamp}</span>
+            {actions.map((action, index) => (
+              <motion.div
+                key={index}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="w-8 h-8"
+                  onClick={() => onActionClick?.(index)}
+                  aria-label={`Action ${index + 1}`}
+                >
+                  {action}
+                </Button>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Card Body */}
+        <motion.div
+          className="p-4 sm:p-6 text-sm text-foreground/90 leading-relaxed"
+          variants={itemVariants}
+        >
+          <p>{message}</p>
+        </motion.div>
+
+        {/* Card Footer with Reply */}
+        <motion.div
+          className="p-3 sm:p-4 mt-auto border-t bg-muted/50"
+          variants={itemVariants}
+        >
+          <div className="flex items-center gap-2">
+            <Input
+              type="text"
+              placeholder="Type here..."
+              className="flex-grow bg-background focus-visible:ring-1 focus-visible:ring-offset-0"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+            />
+            <div className="flex items-center gap-1">
+              {reactions.map((reaction, index) => (
+                <motion.div
+                  key={index}
+                  whileHover={{ scale: 1.2, rotate: -5 }}
+                  whileTap={{ scale: 0.9 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                >
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="w-8 h-8 text-xl"
+                    onClick={() => onReactionClick?.(reaction)}
+                    aria-label={`React with ${reaction}`}
+                  >
+                    {reaction}
+                  </Button>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+    );
+  },
+);
+
+EmailClientCard.displayName = 'EmailClientCard';
+
+export { EmailClientCard, cardVariants };
+
+demo.tsx
+import { EmailClientCard } from '@/components/ui/email-client-card';
+import { Send, Trash, Plus } from 'lucide-react';
+
+const EmailClientCardDemo = () => {
+  // Sample data to populate the component
+  const emailData = {
+    avatarSrc: 'https://i.pravatar.cc/150',
+    avatarFallback: 'SL',
+    senderName: 'Samantha Lusan',
+    senderEmail: 'samantha@icloud.com',
+    timestamp: 'Yesterday, 10:12 am',
+    message:
+      "Yes, they've introduced new APIs for smoother and more dynamic animations. The enhancements to the core animation framework will make it easier to create more engaging user experiences.",
+    reactions: ['😍', '❤️', '🔥', '⚡️', '👍'],
+  };
+
+  const handleReaction = (reaction: string) => {
+    console.log(`Reacted with: ${reaction}`);
+    // Add logic to handle the reaction
+  };
+
+  const handleAction = (index: number) => {
+    const action = ['Send', 'Delete'][index];
+    console.log(`Action clicked: ${action}`);
+    // Add logic for actions
+  };
+
+  return (
+    <div className="flex items-center justify-center h-full w-full p-4 bg-background">
+      <EmailClientCard
+        avatarSrc={emailData.avatarSrc}
+        avatarFallback={emailData.avatarFallback}
+        senderName={emailData.senderName}
+        senderEmail={emailData.senderEmail}
+        timestamp={emailData.timestamp}
+        message={emailData.message}
+        reactions={emailData.reactions}
+        onReactionClick={handleReaction}
+        onActionClick={handleAction}
+        actions={[
+          <Send key="send" className="w-4 h-4" />,
+          <Trash key="trash" className="w-4 h-4" />,
+        ]}
+      />
+    </div>
+  );
+};
+
+export default EmailClientCardDemo;
+```
+
+Copy-paste these files for dependencies:
+```tsx
+originui/input
+import { cn } from "@/lib/utils";
+import * as React from "react";
+
+const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
+  ({ className, type, ...props }, ref) => {
+    return (
+      <input
+        type={type}
+        className={cn(
+          "flex h-9 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm shadow-black/5 transition-shadow placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/20 disabled:cursor-not-allowed disabled:opacity-50",
+          type === "search" &&
+            "[&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none [&::-webkit-search-results-button]:appearance-none [&::-webkit-search-results-decoration]:appearance-none",
+          type === "file" &&
+            "p-0 pr-3 italic text-muted-foreground/70 file:me-3 file:h-full file:border-0 file:border-r file:border-solid file:border-input file:bg-transparent file:px-3 file:text-sm file:font-medium file:not-italic file:text-foreground",
+          className,
+        )}
+        ref={ref}
+        {...props}
+      />
+    );
+  },
+);
+Input.displayName = "Input";
+
+export { Input };
+
+```
+```tsx
+shadcn/avatar
+"use client"
+
+import * as React from "react"
+import * as AvatarPrimitive from "@radix-ui/react-avatar"
+
+import { cn } from "@/lib/utils"
+
+const Avatar = React.forwardRef<
+  React.ElementRef<typeof AvatarPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>
+>(({ className, ...props }, ref) => (
+  <AvatarPrimitive.Root
+    ref={ref}
+    className={cn(
+      "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full",
+      className,
+    )}
+    {...props}
+  />
+))
+Avatar.displayName = AvatarPrimitive.Root.displayName
+
+const AvatarImage = React.forwardRef<
+  React.ElementRef<typeof AvatarPrimitive.Image>,
+  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image>
+>(({ className, ...props }, ref) => (
+  <AvatarPrimitive.Image
+    ref={ref}
+    className={cn("aspect-square h-full w-full", className)}
+    {...props}
+  />
+))
+AvatarImage.displayName = AvatarPrimitive.Image.displayName
+
+const AvatarFallback = React.forwardRef<
+  React.ElementRef<typeof AvatarPrimitive.Fallback>,
+  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback>
+>(({ className, ...props }, ref) => (
+  <AvatarPrimitive.Fallback
+    ref={ref}
+    className={cn(
+      "flex h-full w-full items-center justify-center rounded-full bg-muted",
+      className,
+    )}
+    {...props}
+  />
+))
+AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName
+
+export { Avatar, AvatarImage, AvatarFallback }
+
+```
+```tsx
+shadcn/button
+import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
+import { cva, type VariantProps } from "class-variance-authority"
+
+import { cn } from "@/lib/utils"
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline:
+          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        default: "h-10 px-4 py-2",
+        sm: "h-9 rounded-md px-3",
+        lg: "h-11 rounded-md px-8",
+        icon: "h-10 w-10",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  },
+)
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean
+}
+
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button"
+    return (
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      />
+    )
+  },
+)
+Button.displayName = "Button"
+
+export { Button, buttonVariants }
+
+```
+
+Install NPM dependencies:
+```bash
+framer-motion, class-variance-authority, @radix-ui/react-avatar, @radix-ui/react-slot
+```
+
+
+You are given a task to integrate an existing React component in the codebase
+
+The codebase should support:
+- shadcn project structure  
+- Tailwind CSS
+- Typescript
+
+If it doesn't, provide instructions on how to setup project via shadcn CLI, install Tailwind or Typescript.
+
+Determine the default path for components and styles. 
+If default path for components is not /components/ui, provide instructions on why it's important to create this folder
+Copy-paste this component to /components/ui folder:
+```tsx
+interactive-bento-gallery.tsx
+"use client"
+import React, { useEffect, useRef, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { X } from 'lucide-react';
+
+
+// MediaItemType defines the structure of a media item
+interface MediaItemType {
+    id: number;
+    type: string;
+    title: string;
+    desc: string;
+    url: string;
+    span: string;
+}
+// MediaItem component renders either a video or image based on item.type
+const MediaItem = ({ item, className, onClick }: { item: MediaItemType, className?: string, onClick?: () => void }) => {
+    const videoRef = useRef<HTMLVideoElement>(null); // Reference for video element
+    const [isInView, setIsInView] = useState(false); // To track if video is in the viewport
+    const [isBuffering, setIsBuffering] = useState(true);  // To track if video is buffering
+
+    // Intersection Observer to detect if video is in view and play/pause accordingly
+    useEffect(() => {
+        const options = {
+            root: null,
+            rootMargin: '50px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                setIsInView(entry.isIntersecting); // Set isInView to true if the video is in view
+            });
+        }, options);
+
+        if (videoRef.current) {
+            observer.observe(videoRef.current); // Start observing the video element
+        }
+
+        return () => {
+            if (videoRef.current) {
+                observer.unobserve(videoRef.current); // Clean up observer when component unmounts
+            }
+        };
+    }, []);
+    // Handle video play/pause based on whether the video is in view or not
+    useEffect(() => {
+        let mounted = true;
+
+        const handleVideoPlay = async () => {
+            if (!videoRef.current || !isInView || !mounted) return; // Don't play if video is not in view or component is unmounted
+
+            try {
+                if (videoRef.current.readyState >= 3) {
+                    setIsBuffering(false);
+                    await videoRef.current.play(); // Play the video if it's ready
+                } else {
+                    setIsBuffering(true);
+                    await new Promise((resolve) => {
+                        if (videoRef.current) {
+                            videoRef.current.oncanplay = resolve; // Wait until the video can start playing
+                        }
+                    });
+                    if (mounted) {
+                        setIsBuffering(false);
+                        await videoRef.current.play();
+                    }
+                }
+            } catch (error) {
+                console.warn("Video playback failed:", error);
+            }
+        };
+
+        if (isInView) {
+            handleVideoPlay();
+        } else if (videoRef.current) {
+            videoRef.current.pause();
+        }
+
+        return () => {
+            mounted = false;
+            if (videoRef.current) {
+                videoRef.current.pause();
+                videoRef.current.removeAttribute('src');
+                videoRef.current.load();
+            }
+        };
+    }, [isInView]);
+
+    // Render either a video or image based on item.type
+
+    if (item.type === 'video') {
+        return (
+            <div className={`${className} relative overflow-hidden`}>
+                <video
+                    ref={videoRef}
+                    className="w-full h-full object-cover"
+                    onClick={onClick}
+                    playsInline
+                    muted
+                    loop
+                    preload="auto"
+                    style={{
+                        opacity: isBuffering ? 0.8 : 1,
+                        transition: 'opacity 0.2s',
+                        transform: 'translateZ(0)',
+                        willChange: 'transform',
+                    }}
+                >
+                    <source src={item.url} type="video/mp4" />
+                </video>
+                {isBuffering && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/10">
+                        <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    </div>
+                )}
+            </div>
+        );
+    }
+
+    return (
+        <img
+            src={item.url} // Image source URL
+            alt={item.title} // Alt text for the image
+            className={`${className} object-cover cursor-pointer`} // Style the image
+            onClick={onClick} // Trigger onClick when the image is clicked
+            loading="lazy" // Lazy load the image for performance
+            decoding="async" // Decode the image asynchronously
+        />
+    );
+};
+
+
+
+// GalleryModal component displays the selected media item in a modal
+interface GalleryModalProps {
+    selectedItem: MediaItemType;
+    isOpen: boolean;
+    onClose: () => void;
+    setSelectedItem: (item: MediaItemType | null) => void;
+    mediaItems: MediaItemType[]; // List of media items to display in the modal
+}
+const GalleryModal = ({ selectedItem, isOpen, onClose, setSelectedItem, mediaItems }: GalleryModalProps) => {
+    const [dockPosition, setDockPosition] = useState({ x: 0, y: 0 });  // Track the position of the dockable panel
+
+    if (!isOpen) return null; // Return null if the modal is not open
+
+    return (
+        <>
+            {/* Main Modal */}
+            <motion.div
+                initial={{ scale: 0.98 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.98 }}
+                transition={{
+                    type: "spring",
+                    stiffness: 400,
+                    damping: 30
+                }}
+                className="fixed inset-0 w-full min-h-screen sm:h-[90vh] md:h-[600px] backdrop-blur-lg 
+                          rounded-none sm:rounded-lg md:rounded-xl overflow-hidden z-10"
+
+            >
+                {/* Main Content */}
+                <div className="h-full flex flex-col">
+                    <div className="flex-1 p-2 sm:p-3 md:p-4 flex items-center justify-center bg-gray-50/50">
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={selectedItem.id}
+                                className="relative w-full aspect-[16/9] max-w-[95%] sm:max-w-[85%] md:max-w-3xl 
+                                         h-auto max-h-[70vh] rounded-lg overflow-hidden shadow-md"
+                                initial={{ y: 20, scale: 0.97 }}
+                                animate={{
+                                    y: 0,
+                                    scale: 1,
+                                    transition: {
+                                        type: "spring",
+                                        stiffness: 500,
+                                        damping: 30,
+                                        mass: 0.5
+                                    }
+                                }}
+                                exit={{
+                                    y: 20,
+                                    scale: 0.97,
+                                    transition: { duration: 0.15 }
+                                }}
+                                onClick={onClose}
+                            >
+                                <MediaItem item={selectedItem} className="w-full h-full object-contain bg-gray-900/20" onClick={onClose} />
+                                <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 md:p-4 
+                                              bg-gradient-to-t from-black/50 to-transparent">
+                                    <h3 className="text-white text-base sm:text-lg md:text-xl font-semibold">
+                                        {selectedItem.title}
+                                    </h3>
+                                    <p className="text-white/80 text-xs sm:text-sm mt-1">
+                                        {selectedItem.desc}
+                                    </p>
+                                </div>
+                            </motion.div>
+                        </AnimatePresence>
+                    </div>
+                </div>
+
+                {/* Close Button */}
+                <motion.button
+                    className="absolute top-2 sm:top-2.5 md:top-3 right-2 sm:right-2.5 md:right-3 
+                              p-2 rounded-full bg-gray-200/80 text-gray-700 hover:bg-gray-300/80 
+                              text-xs sm:text-sm backdrop-blur-sm "
+                    onClick={onClose}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                >
+                    <X className='w-3 h-3' />
+                </motion.button>
+
+            </motion.div>
+
+            {/* Draggable Dock */}
+            <motion.div
+                drag
+                dragMomentum={false}
+                dragElastic={0.1}
+                initial={false}
+                animate={{ x: dockPosition.x, y: dockPosition.y }}
+                onDragEnd={(_, info) => {
+                    setDockPosition(prev => ({
+                        x: prev.x + info.offset.x,
+                        y: prev.y + info.offset.y
+                    }));
+                }}
+                className="fixed z-50 left-1/2 bottom-4 -translate-x-1/2 touch-none"
+            >
+                <motion.div
+                    className="relative rounded-xl bg-sky-400/20 backdrop-blur-xl 
+                             border border-blue-400/30 shadow-lg
+                             cursor-grab active:cursor-grabbing"
+                >
+                    <div className="flex items-center -space-x-2 px-3 py-2">
+                        {mediaItems.map((item, index) => (
+                            <motion.div
+                                key={item.id}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedItem(item);
+                                }}
+                                style={{
+                                    zIndex: selectedItem.id === item.id ? 30 : mediaItems.length - index,
+                                }}
+                                className={`
+                                    relative group
+                                    w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 flex-shrink-0 
+                                    rounded-lg overflow-hidden 
+                                    cursor-pointer hover:z-20
+                                    ${selectedItem.id === item.id
+                                        ? 'ring-2 ring-white/70 shadow-lg'
+                                        : 'hover:ring-2 hover:ring-white/30'}
+                                `}
+                                initial={{ rotate: index % 2 === 0 ? -15 : 15 }}
+                                animate={{
+                                    scale: selectedItem.id === item.id ? 1.2 : 1,
+                                    rotate: selectedItem.id === item.id ? 0 : index % 2 === 0 ? -15 : 15,
+                                    y: selectedItem.id === item.id ? -8 : 0,
+                                }}
+                                whileHover={{
+                                    scale: 1.3,
+                                    rotate: 0,
+                                    y: -10,
+                                    transition: { type: "spring", stiffness: 400, damping: 25 }
+                                }}
+                            >
+                                <MediaItem item={item} className="w-full h-full" onClick={() => setSelectedItem(item)} />
+                                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/5 to-white/20" />
+                                {selectedItem.id === item.id && (
+                                    <motion.div
+                                        layoutId="activeGlow"
+                                        className="absolute -inset-2 bg-white/20 blur-xl"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ duration: 0.2 }}
+                                    />
+                                )}
+                            </motion.div>
+                        ))}
+                    </div>
+                </motion.div>
+            </motion.div>
+        </>
+    );
+};
+
+
+
+interface InteractiveBentoGalleryProps {
+    mediaItems: MediaItemType[]
+    title: string
+    description: string
+
+}
+
+const InteractiveBentoGallery: React.FC<InteractiveBentoGalleryProps> = ({ mediaItems, title, description }) => {
+    const [selectedItem, setSelectedItem] = useState<MediaItemType | null>(null);
+    const [items, setItems] = useState(mediaItems);
+    const [isDragging, setIsDragging] = useState(false);
+
+    return (
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
+            <div className="mb-8 text-center">
+                <motion.h1
+                    className="text-2xl sm:text-3xl md:text-4xl font-bold bg-clip-text text-transparent 
+                             bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900
+                             dark:from-white dark:via-gray-200 dark:to-white"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                >
+                    {title}
+                </motion.h1>
+                <motion.p
+                    className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.1 }}
+                >
+                    {description}
+                </motion.p>
+            </div>
+            <AnimatePresence mode="wait">
+                {selectedItem ? (
+                    <GalleryModal
+                        selectedItem={selectedItem}
+                        isOpen={true}
+                        onClose={() => setSelectedItem(null)}
+                        setSelectedItem={setSelectedItem}
+                        mediaItems={items}
+                    />
+                ) : (
+                    <motion.div
+                        className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-3 auto-rows-[60px]"
+                        initial="hidden"
+                        animate="visible"
+                        exit="hidden"
+                        variants={{
+                            hidden: { opacity: 0 },
+                            visible: {
+                                opacity: 1,
+                                transition: { staggerChildren: 0.1 }
+                            }
+                        }}
+                    >
+                        {items.map((item, index) => (
+                            <motion.div
+                                key={item.id}
+                                layoutId={`media-${item.id}`}
+                                className={`relative overflow-hidden rounded-xl cursor-move ${item.span}`}
+                                onClick={() => !isDragging && setSelectedItem(item)}
+                                variants={{
+                                    hidden: { y: 50, scale: 0.9, opacity: 0 },
+                                    visible: {
+                                        y: 0,
+                                        scale: 1,
+                                        opacity: 1,
+                                        transition: {
+                                            type: "spring",
+                                            stiffness: 350,
+                                            damping: 25,
+                                            delay: index * 0.05
+                                        }
+                                    }
+                                }}
+                                whileHover={{ scale: 1.02 }}
+                                drag
+                                dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+                                dragElastic={1}
+                                onDragStart={() => setIsDragging(true)}
+                                onDragEnd={(e, info) => {
+                                    setIsDragging(false);
+                                    const moveDistance = info.offset.x + info.offset.y;
+                                    if (Math.abs(moveDistance) > 50) {
+                                        const newItems = [...items];
+                                        const draggedItem = newItems[index];
+                                        const targetIndex = moveDistance > 0 ?
+                                            Math.min(index + 1, items.length - 1) :
+                                            Math.max(index - 1, 0);
+                                        newItems.splice(index, 1);
+                                        newItems.splice(targetIndex, 0, draggedItem);
+                                        setItems(newItems);
+                                    }
+                                }}
+                            >
+                                <MediaItem
+                                    item={item}
+                                    className="absolute inset-0 w-full h-full"
+                                    onClick={() => !isDragging && setSelectedItem(item)}
+                                />
+                                <motion.div
+                                    className="absolute inset-0 flex flex-col justify-end p-2 sm:p-3 md:p-4"
+                                    initial={{ opacity: 0 }}
+                                    whileHover={{ opacity: 1 }}
+                                    transition={{ duration: 0.2 }}
+                                >
+                                    <div className="absolute inset-0 flex flex-col justify-end p-2 sm:p-3 md:p-4">
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                                        <h3 className="relative text-white text-xs sm:text-sm md:text-base font-medium line-clamp-1">
+                                            {item.title}
+                                        </h3>
+                                        <p className="relative text-white/70 text-[10px] sm:text-xs md:text-sm mt-0.5 line-clamp-2">
+                                            {item.desc}
+                                        </p>
+                                    </div>
+                                </motion.div>
+                            </motion.div>
+                        ))}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+};
+
+
+export default InteractiveBentoGallery
+
+demo.tsx
+import InteractiveBentoGallery from "@/components/blocks/interactive-bento-gallery"
+
+const mediaItems = [
+  {
+    id: 1,
+    type: "image",
+    title: "Anurag Mishra",
+    desc: "Driven, innovative, visionary",
+    url: "https://kxptt4m9j4.ufs.sh/f/9YHhEDeslzkcbP3rYTiXwH7Y106CepJOsoAgQjyFi3MUfDkh",
+    span: "md:col-span-1 md:row-span-3 sm:col-span-1 sm:row-span-2",
+  },
+  {
+    id: 2,
+    type: "video",
+    title: "Dog Puppy",
+    desc: "Adorable loyal companion.",
+    url: "https://cdn.pixabay.com/video/2024/07/24/222837_large.mp4",
+    span: "md:col-span-2 md:row-span-2 col-span-1 sm:col-span-2 sm:row-span-2",
+  },
+  {
+    id: 3,
+    type: "image",
+    title: "Forest Path",
+    desc: "Mystical forest trail",
+    url: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e",
+    span: "md:col-span-1 md:row-span-3 sm:col-span-2 sm:row-span-2 ",
+  },
+  {
+    id: 4,
+    type: "image",
+    title: "Falling Leaves",
+    desc: "Autumn scenery",
+    url: "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+    span: "md:col-span-2 md:row-span-2 sm:col-span-1 sm:row-span-2 ",
+  },
+  {
+    id: 5,
+    type: "video",
+    title: "Bird Parrot",
+    desc: "Vibrant feathered charm",
+    url: "https://cdn.pixabay.com/video/2020/07/30/46026-447087782_large.mp4",
+    span: "md:col-span-1 md:row-span-3 sm:col-span-1 sm:row-span-2 ",
+  },
+  {
+    id: 6,
+    type: "image",
+    title: "Beach Paradise",
+    desc: "Sunny tropical beach",
+    url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
+    span: "md:col-span-2 md:row-span-2 sm:col-span-1 sm:row-span-2 ",
+  },
+  {
+    id: 7,
+    type: "video",
+    title: "Shiva Temple",
+    desc: "Peaceful Shiva sanctuary.",
+    url: "https://cdn.pixabay.com/video/2020/05/25/40130-424930032_large.mp4",
+    span: "md:col-span-1 md:row-span-3 sm:col-span-1 sm:row-span-2 ",
+  },
+]
+
+export function BentoGridGalleryDemo() {
+  return (
+    <div className="min-h-screen overflow-y-auto">
+      <InteractiveBentoGallery
+        mediaItems={mediaItems}
+        title="Gallery Shots Collection"
+        description="Drag and explore our curated collection of shots"
+      />
+    </div>
+  )
+}
+
+```
+
+Install NPM dependencies:
+```bash
+lucide-react, framer-motion
+```
+
+
+
+You are given a task to integrate an existing React component in the codebase
+
+The codebase should support:
+- shadcn project structure  
+- Tailwind CSS
+- Typescript
+
+If it doesn't, provide instructions on how to setup project via shadcn CLI, install Tailwind or Typescript.
+
+Determine the default path for components and styles. 
+If default path for components is not /components/ui, provide instructions on why it's important to create this folder
+Copy-paste this component to /components/ui folder:
+```tsx
+limelight-nav.tsx
+import React, { useState, useRef, useLayoutEffect, cloneElement } from 'react';
+
+// --- Internal Types and Defaults ---
+
+const DefaultHomeIcon = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg>;
+const DefaultCompassIcon = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z" /></svg>;
+const DefaultBellIcon = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>;
+
+type NavItem = {
+  id: string | number;
+  icon: React.ReactElement;
+  label?: string;
+  onClick?: () => void;
+};
+
+const defaultNavItems: NavItem[] = [
+  { id: 'default-home', icon: <DefaultHomeIcon />, label: 'Home' },
+  { id: 'default-explore', icon: <DefaultCompassIcon />, label: 'Explore' },
+  { id: 'default-notifications', icon: <DefaultBellIcon />, label: 'Notifications' },
+];
+
+type LimelightNavProps = {
+  items?: NavItem[];
+  defaultActiveIndex?: number;
+  onTabChange?: (index: number) => void;
+  className?: string;
+  limelightClassName?: string;
+  iconContainerClassName?: string;
+  iconClassName?: string;
+};
+
+/**
+ * An adaptive-width navigation bar with a "limelight" effect that highlights the active item.
+ */
+export const LimelightNav = ({
+  items = defaultNavItems,
+  defaultActiveIndex = 0,
+  onTabChange,
+  className,
+  limelightClassName,
+  iconContainerClassName,
+  iconClassName,
+}: LimelightNavProps) => {
+  const [activeIndex, setActiveIndex] = useState(defaultActiveIndex);
+  const [isReady, setIsReady] = useState(false);
+  const navItemRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+  const limelightRef = useRef<HTMLDivElement | null>(null);
+
+  useLayoutEffect(() => {
+    if (items.length === 0) return;
+
+    const limelight = limelightRef.current;
+    const activeItem = navItemRefs.current[activeIndex];
+    
+    if (limelight && activeItem) {
+      const newLeft = activeItem.offsetLeft + activeItem.offsetWidth / 2 - limelight.offsetWidth / 2;
+      limelight.style.left = `${newLeft}px`;
+
+      if (!isReady) {
+        setTimeout(() => setIsReady(true), 50);
+      }
+    }
+  }, [activeIndex, isReady, items]);
+
+  if (items.length === 0) {
+    return null; 
+  }
+
+  const handleItemClick = (index: number, itemOnClick?: () => void) => {
+    setActiveIndex(index);
+    onTabChange?.(index);
+    itemOnClick?.();
+  };
+
+  return (
+    <nav className={`relative inline-flex items-center h-16 rounded-lg bg-card text-foreground border px-2 ${className}`}>
+      {items.map(({ id, icon, label, onClick }, index) => (
+          <a
+            key={id}
+            ref={el => (navItemRefs.current[index] = el)}
+            className={`relative z-20 flex h-full cursor-pointer items-center justify-center p-5 ${iconContainerClassName}`}
+            onClick={() => handleItemClick(index, onClick)}
+            aria-label={label}
+          >
+            {cloneElement(icon, {
+              className: `w-6 h-6 transition-opacity duration-100 ease-in-out ${
+                activeIndex === index ? 'opacity-100' : 'opacity-40'
+              } ${icon.props.className || ''} ${iconClassName || ''}`,
+            })}
+          </a>
+      ))}
+
+      <div 
+        ref={limelightRef}
+        className={`absolute top-0 z-10 w-11 h-[5px] rounded-full bg-primary shadow-[0_50px_15px_var(--primary)] ${
+          isReady ? 'transition-[left] duration-400 ease-in-out' : ''
+        } ${limelightClassName}`}
+        style={{ left: '-999px' }}
+      >
+        <div className="absolute left-[-30%] top-[5px] w-[160%] h-14 [clip-path:polygon(5%_100%,25%_0,75%_0,95%_100%)] bg-gradient-to-b from-primary/30 to-transparent pointer-events-none" />
+      </div>
+    </nav>
+  );
+};
+
+demo.tsx
+import { LimelightNav, NavItem } from "@/components/ui/limelight-nav";
+import { Home, Bookmark, PlusCircle, User, Settings } from 'lucide-react';
+
+const customNavItems = [
+  { id: 'home', icon: <Home />, label: 'Home', onClick: () => console.log('Home Clicked!') },
+  { id: 'bookmark', icon: <Bookmark />, label: 'Bookmarks', onClick: () => console.log('Bookmark Clicked!') },
+  { id: 'add', icon: <PlusCircle />, label: 'Add New', onClick: () => console.log('Add Clicked!') },
+  { id: 'profile', icon: <User />, label: 'Profile', onClick: () => console.log('Profile Clicked!') },
+  { id: 'settings', icon: <Settings />, label: 'Settings', onClick: () => console.log('Settings Clicked!') },
+];
+
+const Customized = () => {
+  return <LimelightNav className="bg-secondary dark:bg-card/50 dark:border-accent/50 rounded-xl" items={customNavItems} />;
+};
+
+export { Customized };
+
+const Default = () => {
+  return <LimelightNav />;
+};
+
+export { Default };
+```
+
+
+
+You are given a task to integrate an existing React component in the codebase
+
+The codebase should support:
+- shadcn project structure  
+- Tailwind CSS
+- Typescript
+
+If it doesn't, provide instructions on how to setup project via shadcn CLI, install Tailwind or Typescript.
+
+Determine the default path for components and styles. 
+If default path for components is not /components/ui, provide instructions on why it's important to create this folder
+Copy-paste this component to /components/ui folder:
+```tsx
 modern-mobile-menu.tsx
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Home, Briefcase, Calendar, Shield, Settings } from 'lucide-react';
