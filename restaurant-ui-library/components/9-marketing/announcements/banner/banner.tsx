@@ -4,7 +4,7 @@ import * as React from 'react'
 import { X } from 'lucide-react'
 import { cva, type VariantProps } from 'class-variance-authority'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/2-ordering-system/checkout-buttons/button'
 import { cn } from '@/lib/utils'
 
 const bannerVariants = cva(

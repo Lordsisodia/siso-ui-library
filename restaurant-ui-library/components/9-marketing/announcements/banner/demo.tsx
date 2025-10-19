@@ -4,7 +4,7 @@ import React from 'react'
 import { ArrowRightIcon, Rocket } from 'lucide-react'
 
 import { Banner } from './banner'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/2-ordering-system/checkout-buttons/button'
 import { cn } from '@/lib/utils'
 
 export default function DefaultDemo() {

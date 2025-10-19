@@ -19,10 +19,16 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@radix-ui/react-avatar": "^1.0.4",
+    "@radix-ui/react-slot": "^1.0.2",
+    "class-variance-authority": "^0.7.0",
+    "framer-motion": "^11.0.0",
+    "lucide-react": "^0.469.0",
     "openai": "^4.73.0",
     "playwright": "^1.49.1"
   },
   "devDependencies": {
-    "@anthropic-ai/sdk": "^0.30.1"
+    "@anthropic-ai/sdk": "^0.30.1",
+    "next": "^14.2.5"
   }
 }

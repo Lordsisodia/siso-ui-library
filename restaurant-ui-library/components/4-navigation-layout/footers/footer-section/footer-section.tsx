@@ -3,11 +3,16 @@
 import * as React from "react"
 import { Facebook, Instagram, Linkedin, Moon, Send, Sun, Twitter } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Button } from "@/components/2-ordering-system/checkout-buttons/button"
+import { Input } from "@/components/2-ordering-system/input-fields/input"
+import { Label } from "@/components/2-ordering-system/input-fields/label"
+import { Switch } from "@/components/2-ordering-system/toggles/switch"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/5-user-feedback/tooltips/tooltip"
 
 function Footerdemo() {
   const [isDarkMode, setIsDarkMode] = React.useState(true)

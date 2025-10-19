@@ -1,0 +1,16 @@
+{
+  "name": "nextui-library",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@nextui-org/react": "^2.6.11",
+    "framer-motion": "^12.23.24"
+  }
+}

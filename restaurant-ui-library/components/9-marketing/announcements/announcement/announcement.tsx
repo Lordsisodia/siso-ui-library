@@ -1,6 +1,6 @@
 import { type HTMLAttributes, createContext, useContext } from "react"
 
-import { Badge, type BadgeProps } from "@/components/ui/badge"
+import { Badge, type BadgeProps } from "@/components/1-menu-display/dietary-badges/badge"
 import { cn } from "@/lib/utils"
 
 type BadgeContextType = {

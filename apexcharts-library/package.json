@@ -1,0 +1,16 @@
+{
+  "name": "apexcharts-library",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "apexcharts": "^5.3.5",
+    "react-apexcharts": "^1.8.0"
+  }
+}

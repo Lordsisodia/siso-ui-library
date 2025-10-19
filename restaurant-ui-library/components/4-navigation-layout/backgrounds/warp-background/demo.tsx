@@ -3,7 +3,7 @@ import {
   CardContent,
   CardDescription,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/1-menu-display/menu-item-cards/card"
 
 import { WarpBackground } from "./warp-background"
 
