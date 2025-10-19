@@ -1,0 +1,107 @@
+{
+  "library_version": "1.0.0",
+  "last_updated": "2025-10-18",
+  "total_components": 0,
+  "categories": {
+    "menu_display": {
+      "name": "Menu Display",
+      "description": "Menu item cards, dish images, pricing, categories",
+      "priority": "critical",
+      "components": []
+    },
+    "ordering_system": {
+      "name": "Ordering System",
+      "description": "Cart, checkout, customization, order forms",
+      "priority": "critical",
+      "components": []
+    },
+    "booking_reservations": {
+      "name": "Booking & Reservations",
+      "description": "Date pickers, table selection, reservation forms",
+      "priority": "high",
+      "components": []
+    },
+    "navigation_layout": {
+      "name": "Navigation & Layout",
+      "description": "Headers, footers, menus, hero sections",
+      "priority": "high",
+      "components": []
+    },
+    "user_feedback": {
+      "name": "User Feedback",
+      "description": "Alerts, notifications, loading states, tooltips",
+      "priority": "high",
+      "components": []
+    },
+    "user_account": {
+      "name": "User Account",
+      "description": "Login, profile, order history, loyalty",
+      "priority": "medium",
+      "components": []
+    },
+    "social_proof": {
+      "name": "Social Proof",
+      "description": "Reviews, ratings, testimonials",
+      "priority": "medium",
+      "components": []
+    },
+    "interactive_features": {
+      "name": "Interactive Features",
+      "description": "AI chat, videos, maps, file uploads",
+      "priority": "low",
+      "components": []
+    },
+    "marketing": {
+      "name": "Marketing",
+      "description": "Promotions, announcements, CTAs",
+      "priority": "low",
+      "components": []
+    }
+  },
+  "components": [],
+  "analysis_metadata": {
+    "ai_analyzed": false,
+    "last_analysis_date": null,
+    "analysis_version": null
+  },
+  "usage_statistics": {
+    "most_used": [],
+    "highest_rated": [],
+    "recommended_combinations": []
+  },
+  "instructions": {
+    "purpose": "This catalog provides structured data for AI analysis and programmatic access to restaurant UI components",
+    "schema": {
+      "component": {
+        "id": "Unique identifier (kebab-case)",
+        "name": "Human-readable name",
+        "description": "What the component does",
+        "category": "Primary category from categories list",
+        "tags": ["Array", "of", "relevant", "tags"],
+        "image_path": "Path to component image",
+        "metadata": {
+          "complexity": "low | medium | high",
+          "responsive": true,
+          "interactive": true,
+          "restaurant_types": ["fast-food", "fine-dining", "casual", "cafe"],
+          "use_cases": ["Array of specific use cases"]
+        },
+        "ai_analysis": {
+          "scores": {
+            "visual_quality": 0,
+            "usability": 0,
+            "restaurant_fit": 0,
+            "reusability": 0,
+            "technical": 0
+          },
+          "overall_score": 0,
+          "rating": "Excellent | Good | Fair | Poor | Unsuitable",
+          "strengths": [],
+          "weaknesses": [],
+          "recommendations": [],
+          "analyzed_date": "ISO date string"
+        }
+      }
+    }
+  }
+}

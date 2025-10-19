@@ -1,0 +1,28 @@
+{
+  "name": "restaurant-ui-library",
+  "version": "1.0.0",
+  "description": "Curated UI component library for restaurant applications",
+  "main": "index.js",
+  "scripts": {
+    "import:code": "node scripts/import-code-from-21st.js",
+    "organize": "node scripts/organize-from-chatgpt.js",
+    "add": "node add-component.js",
+    "generate:metadata": "node scripts/generate-metadata.js"
+  },
+  "keywords": [
+    "restaurant",
+    "ui",
+    "components",
+    "design-system",
+    "food-service"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "openai": "^4.73.0",
+    "playwright": "^1.49.1"
+  },
+  "devDependencies": {
+    "@anthropic-ai/sdk": "^0.30.1"
+  }
+}
