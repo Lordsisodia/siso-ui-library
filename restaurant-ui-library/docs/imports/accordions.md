@@ -2,5 +2,5 @@
 
 ## Cherry-Picked Components from 21st.dev
 
-<!-- Add your selected accordion components here -->
-
+- ✅ `Faq1` imported to `components/ui/faq1`
+- ✅ `AccordionFeatureSection` imported to `components/ui/accordion-feature-section`

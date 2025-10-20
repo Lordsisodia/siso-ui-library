@@ -1,0 +1,6 @@
+node_modules/
+dist/
+21st-dev-components/
+scraper-checkpoint.json
+*.log
+.DS_Store
